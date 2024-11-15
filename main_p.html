@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gra Edukacyjna - Klasy 1-3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url(zdjecia/tloniebo.jpg);
+        }
+
+        .game-container {
+            width: 90%;
+            max-width: 700px;
+            background-color: #ffffffda;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .game-header {
+            margin-bottom: 20px;
+        }
+
+        .tasks {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-radius: 8px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .answer-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+            scale: 103%;
+        }
+
+        .answer-btn img {
+            width: 100px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .puzzle-container {
+            margin-top: 20px;
+        }
+
+        .puzzle {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 0;
+        }
+
+        .puzzle-piece {
+            width: 100%;
+            aspect-ratio: 3 / 2;
+            background-image: url('pic1.png');
+            background-size: 300% 200%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .puzzle-piece.revealed {
+            opacity: 1;
+        }
+
+        .puzzle-piece:nth-child(1) { background-position: 0% 0%; }
+        .puzzle-piece:nth-child(2) { background-position: 50% 0%; }
+        .puzzle-piece:nth-child(3) { background-position: 100% 0%; }
+        .puzzle-piece:nth-child(4) { background-position: 0% 100%; }
+        .puzzle-piece:nth-child(5) { background-position: 50% 100%; }
+        .puzzle-piece:nth-child(6) { background-position: 100% 100%; }
+
+        .reset-game {
+            background-color: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .reset-game:hover {
+            background-color: #d32f2f;
+        }
+        
+        .wrong {
+            color: black;
+            border-radius: 7px;
+            margin-bottom: 30px;
+            margin-top: 30px;
+            font-weight: bolder;
+        }
+        #navigate-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ffb703;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #navigate-button:active {
+            background-color: #fb8500;
+        }
+    </style>
+</head>
+<body>
+    <button id="navigate-button" onclick="window.location.href='menuPrzedszkole.html'">Powrót</button>
+
+    <div class="game-container">
+        <header class="game-header">
+            <p>Rozwiąż zadania i odkryj obrazek!</p>
+        </header>
+
+        <section class="tasks">
+            <h2>Twoje zadanie:</h2>
+            <div id="task-content" class="task-content"></div>
+            <div class="answers">
+                <button class="answer-btn" data-answer="A"><img src="" alt="A" /></button>
+                <button class="answer-btn" data-answer="B"><img src="" alt="B" /></button>
+                <button class="answer-btn" data-answer="C"><img src="" alt="C" /></button>
+                <button class="answer-btn" data-answer="D"><img src="" alt="D" /></button>
+                <section class="wrong">
+                    <h1>Niestety, to nie jest poprawna odpowiedź. Spróbuj ponownie</h1>
+                </section>
+            </div>
+        </section>
+
+        <section class="puzzle-container">
+            <h2>Twój postęp:</h2>
+            <div class="puzzle">
+                <div class="puzzle-piece" data-piece="1"></div>
+                <div class="puzzle-piece" data-piece="2"></div>
+                <div class="puzzle-piece" data-piece="3"></div>
+                <div class="puzzle-piece" data-piece="4"></div>
+                <div class="puzzle-piece" data-piece="5"></div>
+                <div class="puzzle-piece" data-piece="6"></div>
+            </div>
+        </section>
+
+        <button class="reset-game">Zresetuj grę</button>
+    </div>
+
+    <script>
+        document.querySelectorAll('.wrong').forEach(el => el.style.display = 'none');
+        let currentTaskIndex = 0;
+        const taskContent = document.getElementById('task-content');
+        const resetGameBtn = document.querySelector('.reset-game');
+        const answerButtons = document.querySelectorAll('.answer-btn');
+        const puzzlePieces = document.querySelectorAll('.puzzle-piece');
+
+        const tasks = [
+            { 
+                question: "Wskaż lwa", 
+                options: { 
+                    A: "https://images.pexels.com/photos/46795/lion-big-cat-predator-safari-46795.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    B: "https://images.pexels.com/photos/35435/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=600", 
+                    C: "https://images.pexels.com/photos/106690/pexels-photo-106690.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    D: "https://images.pexels.com/photos/397857/pexels-photo-397857.jpeg?auto=compress&cs=tinysrgb&w=600" 
+                }, 
+                correct: "A" 
+            },
+            { 
+                question: "Wskaż niedźwiedzia", 
+                options: { 
+                    A: "https://images.pexels.com/photos/46795/lion-big-cat-predator-safari-46795.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    B: "https://images.pexels.com/photos/35435/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=600", 
+                    C: "https://images.pexels.com/photos/106690/pexels-photo-106690.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    D: "https://images.pexels.com/photos/29342505/pexels-photo-29342505/free-photo-of-close-up-of-african-elephant-in-namibia.jpeg?auto=compress&cs=tinysrgb&w=600"
+                }, 
+                correct: "B" 
+            },
+            { 
+                question: "Wskaż węża", 
+                options: { 
+                    A: "https://images.pexels.com/photos/397857/pexels-photo-397857.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    B: "https://images.pexels.com/photos/46795/lion-big-cat-predator-safari-46795.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    C: "https://images.pexels.com/photos/106690/pexels-photo-106690.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    D: "https://images.pexels.com/photos/35435/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=600" 
+                }, 
+                correct: "C" 
+            },
+            { 
+                question: "Wskaż wilka", 
+                options: { 
+                    A: "https://images.pexels.com/photos/35435/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=600", 
+                    B: "https://images.pexels.com/photos/397857/pexels-photo-397857.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    C: "https://images.pexels.com/photos/46795/lion-big-cat-predator-safari-46795.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    D: "https://images.pexels.com/photos/29342505/pexels-photo-29342505/free-photo-of-close-up-of-african-elephant-in-namibia.jpeg?auto=compress&cs=tinysrgb&w=600" 
+                }, 
+                correct: "B" 
+            },
+            { 
+                question: "Wskaż słonia", 
+                options: { 
+                    A: "https://images.pexels.com/photos/29342505/pexels-photo-29342505/free-photo-of-close-up-of-african-elephant-in-namibia.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    B: "https://images.pexels.com/photos/106690/pexels-photo-106690.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    C: "https://images.pexels.com/photos/397857/pexels-photo-397857.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    D: "https://images.pexels.com/photos/2541239/pexels-photo-2541239.jpeg?auto=compress&cs=tinysrgb&w=600" 
+                }, 
+                correct: "A" 
+            },
+            { 
+                question: "Wskaż tygrysa", 
+                options: { 
+                    A: "https://images.pexels.com/photos/106690/pexels-photo-106690.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    B: "https://images.pexels.com/photos/2541239/pexels-photo-2541239.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    C: "https://images.pexels.com/photos/29342505/pexels-photo-29342505/free-photo-of-close-up-of-african-elephant-in-namibia.jpeg?auto=compress&cs=tinysrgb&w=600", 
+                    D: "https://images.pexels.com/photos/35435/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=600" 
+                }, 
+                correct: "B" 
+            }
+        ];
+
+        function startGame() {
+            displayTask();
+        }
+
+        function displayTask() {
+            const currentTask = tasks[currentTaskIndex];
+            taskContent.innerHTML = `<p>${currentTask.question}</p>`;
+
+            answerButtons.forEach((button, index) => {
+                const optionKey = String.fromCharCode(65 + index); // 'A', 'B', 'C', 'D'
+                const optionImg = currentTask.options[optionKey];
+                button.querySelector('img').src = optionImg;
+                button.setAttribute('data-answer', optionKey);
+            });
+        }
+
+        answerButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                checkAnswer(button.getAttribute('data-answer'));
+            });
+        });
+
+        function checkAnswer(selectedAnswer) {
+            const correctAnswer = tasks[currentTaskIndex].correct;
+
+            if (selectedAnswer === correctAnswer) {
+                const currentPuzzlePiece = puzzlePieces[currentTaskIndex];
+                currentPuzzlePiece.classList.add('revealed');
+                currentTaskIndex++;
+
+                if (currentTaskIndex < tasks.length) {
+                    displayTask();
+                } else {
+                    taskContent.innerHTML = '<p>Gratulacje! Ukończyłeś wszystkie zadania i odkryłeś cały obrazek!</p>';
+                    answerButtons.forEach(button => button.disabled = true);
+                }
+            } else {
+                document.querySelectorAll('.wrong').forEach(el => {
+                    el.style.display = 'block';
+                    setTimeout(() => {
+                        el.style.display = 'none';
+                    }, 2500);
+                });
+            }
+        }
+
+        resetGameBtn.addEventListener('click', resetGame);
+
+        function resetGame() {
+            currentTaskIndex = 0;
+            answerButtons.forEach(button => button.disabled = false);
+            puzzlePieces.forEach(piece => piece.classList.remove('revealed'));
+            taskContent.innerHTML = '';
+            displayTask();
+        }
+
+        startGame();
+    </script>
+</body>
+</html>

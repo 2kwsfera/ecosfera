@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wybór Poziomu Gry</title>
+    <style>
+        /* Resetowanie marginesów i stylów domyślnych */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Styl dla całego kontenera */
+html {
+    font-family: Arial, sans-serif;
+    background-image: url(zdjecia/lotus.jpg);
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+body{
+    
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #6b11cbc4 0%, #2574fccd 100%);
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.container {
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+    margin-bottom: 20px;
+    font-size: 3rem;
+}
+
+/* Styl przycisków w menu */
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.menu-item {
+    font-size: 1.2rem;
+    padding: 15px;
+    background-color: #bbf2f5;
+    color: #2575fc;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 30vh;
+}
+
+.menu-item:hover {
+    background-color: #2575fc;
+    color: #ffffff;
+    scale: 105%;
+}
+
+.selected-level {
+    margin: 15px 0;
+    font-size: 1.1rem;
+}
+
+/* Styl przycisku "Graj" */
+.play-button {
+    font-size: 1.4rem;
+    padding: 15px;
+    width: 100%;
+    background-color: #ff6b6b;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.play-button:hover {
+    background-color: #ff4757;
+}
+
+/* Responsywność */
+@media (max-width: 500px) {
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    .menu-item, .play-button {
+        font-size: 1rem;
+        padding: 10px;
+    }
+}
+
+h3{
+    margin-bottom: 3rem;
+}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Witamy w Ecosfera</h1>
+    <h3>Wybierz poziom gry, aby rozpocząć</h3>
+    
+    <div class="menu">
+        <a href="startPrzedszkole.html"><button class="menu-item" onclick="selectLevel('Przedszkole')">Przedszkole</button></a>
+        <a href="start1-3.html"><button class="menu-item" onclick="selectLevel('Klasy 1-3')">Klasy 1-3</button></a>
+        <a href="start4-8.html"><button class="menu-item" onclick="selectLevel('Klasy 4-8')">Klasy 4-8</button></a>
+    </div>
+
+
+
+<script>// Przechowujemy wybrany poziom
+    let selectedLevel = '';
+    
+    function selectLevel(level) {
+        selectedLevel = level;
+        document.getElementById('selectedLevel').innerText = level;
+    }
+    
+   
+    </script>
+</body>
+</html>

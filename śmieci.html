@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gra - Sortowanie Śmieci</title>
+  <style>
+    /* Styles remain mostly unchanged */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('zdjecia/sortowanie.jpg');
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      color: #333;
+    }
+
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      max-width: 90%;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2e8b57;
+      text-shadow: 1px 1px 2px #fff;
+      text-align: center;
+    }
+
+    .status {
+      font-size: 18px;
+      color: #2e8b57;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .difficulty-select {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    .difficulty-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      color: white;
+      transition: 0.5s;
+    }
+    .difficulty-btn:hover{
+      transition: 0.5s;
+      scale: 110%;
+    }
+
+    .easy { background-color: #4caf50; }
+    .medium { background-color: #f1c40f; }
+    .hard { background-color: #e74c3c; }
+
+    .trash-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px;
+      background-color: #f0e68c;
+      border: 2px solid #bbb;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .trash-item img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    .bins {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .bin {
+      width: 90px;
+      height: 90px;
+      background-color: #eee;
+      border: 2px dashed #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      border-radius: 10px;
+      transition: background-color 0.3s;
+      color: white;
+    }
+
+    .bin[data-type="papier"] { background-color: #3498db; }
+    .bin[data-type="plastik"] { background-color: #f1c40f; }
+    .bin[data-type="szkło"] { background-color: #27ae60; }
+    #navigate-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ffb703;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #navigate-button:active {
+            background-color: #fb8500;
+        }
+    .bin.over { background-color: #cce5ff; }
+  </style>
+</head>
+<body>
+  <button id="navigate-button" onclick="window.location.href='menu1-3.html'">Powrót</button>
+
+  <div class="game-container">
+    <div class="title">Gra - Sortowanie Śmieci</div>
+    <div class="status" id="status">❤❤❤❤</div>
+
+    <div class="difficulty-select">
+      <button class="difficulty-btn easy" onclick="selectDifficulty('easy')">Łatwy</button>
+      <button class="difficulty-btn medium" onclick="selectDifficulty('medium')">Średni</button>
+      <button class="difficulty-btn hard" onclick="selectDifficulty('hard')">Trudny</button>
+
+    </div>
+
+    <div class="trash-box"></div>
+    <div class="bins">
+      <div class="bin" data-type="papier">Papier</div>
+      <div class="bin" data-type="plastik">Plastik</div>
+      <div class="bin" data-type="szkło">Szkło</div>
+    </div>
+  </div>
+
+  <script>
+    const statusDisplay = document.getElementById('status');
+    const trashBox = document.querySelector('.trash-box');
+    const bins = document.querySelectorAll('.bin');
+    let lives = 4;
+    let correctCount = 0;
+    let draggedItem = null;
+
+    const trashItems = {
+      easy: [
+        { name: 'Karton po mleku', type: 'plastik', image: 'zdjecia/milk.png' },
+        { name: 'Gazeta', type: 'papier', image: 'zdjecia/news.png' },
+        { name: 'Butelka plastikowa', type: 'plastik', image: 'zdjecia/butel.png' },
+        { name: 'Torba na zakupy', type: 'papier', image: 'zdjecia/bag.png' },
+        { name: 'Szklanka', type: 'szkło', image: 'zdjecia/glass.png' },
+        { name: 'Karton po soku', type: 'plastik', image: 'zdjecia/juice.png' },
+        { name: 'Słoik po dżemie', type: 'szkło', image: 'zdjecia/jam.png' }
+      ],
+      medium: [
+        { name: 'Zeszyt', type: 'papier' },
+        { name: 'Gazeta', type: 'papier' },
+        { name: 'Torebka plastikowa', type: 'plastik' },
+        { name: 'Butelka po wodzie', type: 'plastik' },
+        { name: 'Butelka po ', type: 'szkło' },
+        { name: 'Szklanka', type: 'szkło' },
+        { name: 'Opakowanie po makaronie', type: 'papier' },
+        { name: 'Pojemnik po jogurcie', type: 'plastik' },
+        { name: 'Słoik po majonezie', type: 'szkło' }
+      ],
+      hard: [
+        { name: 'Karton po pizzy', type: 'papier' },
+        { name: 'Gazeta', type: 'papier' },
+        { name: 'Butelka po płynie do mycia naczyń', type: 'plastik' },
+        { name: 'Reklamówka foliowa', type: 'plastik' },
+        { name: 'Lustro', type: 'szkło' },
+        { name: 'Ceramiczna miska', type: 'szkło' },
+        { name: 'Torba papierowa', type: 'papier' },
+        { name: 'Koc 100% poliester', type: 'plastik' },
+        { name: 'Wazon', type: 'szkło' }
+      ]
+    };
+
+    function selectDifficulty(level) {
+      trashBox.innerHTML = '';
+      correctCount = 0;
+      lives = 4;
+      updateLives();
+
+      trashItems[level].forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('trash-item');
+        div.setAttribute('draggable', 'true');
+        div.dataset.type = item.type;
+
+        const img = document.createElement('img');
+        img.src = item.image;
+        img.alt = item.name;
+        
+        div.appendChild(img);
+        trashBox.appendChild(div);
+
+        div.addEventListener('dragstart', () => draggedItem = div);
+        div.addEventListener('dragend', () => draggedItem = null);
+      });
+    }
+
+    bins.forEach(bin => {
+      bin.addEventListener('dragover', event => event.preventDefault());
+      bin.addEventListener('drop', () => {
+        if (draggedItem && draggedItem.dataset.type === bin.dataset.type) {
+          updateStatus('Dobrze zrobione!');
+          draggedItem.remove();
+          correctCount++;
+          if (correctCount === 9) {
+            updateStatus('Super wykonane zadanie!');
+          }
+        } else {
+          lives--;
+          updateLives();
+          if (lives === 0) {
+            updateStatus('Koniec gry! Spróbuj ponownie.');
+            setTimeout(resetGame, 2000);
+          }
+        }
+      });
+    });
+
+    function updateLives() {
+      statusDisplay.textContent = '❤'.repeat(lives);
+    }
+
+    function updateStatus(message) {
+      statusDisplay.textContent = message;
+    }
+
+    function resetGame() {
+      selectDifficulty('easy');
+    }
+  </script>
+</body>
+</html>

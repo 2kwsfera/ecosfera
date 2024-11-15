@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gra z pytaniami</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url(zdjecia/las.jpg);
+            color: #333;
+            margin: 0;
+            padding: 0px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            background: #ffffffc6;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            color: #007acc;
+            font-size: 1.8em;
+        }
+        .tekst {
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+        .pytanie {
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        #pytanieContainer {
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #e7f3fe;
+            margin-top: 10px;
+        }
+        .option-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .option {
+            display: inline-block;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 5px;
+        }
+        .option img {
+            width: 120px; /* Set a fixed width */
+            height: 120px; /* Set a fixed height */
+            object-fit: cover; /* Ensures images scale properly within the dimensions */
+            border-radius: 5px;
+        }
+        .option input[type="radio"] {
+            display: none;
+        }
+        .option:hover {
+            transform: scale(1.05);
+        }
+        .option input[type="radio"]:checked + label {
+            border: 2px solid #007acc;
+        }
+        #nextButton, #startButton {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007acc;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+        #nextButton:hover, #startButton:hover {
+            background-color: #005f99;
+        }
+        #nextButton:disabled, #startButton:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+        #punkty, #komunikat {
+            margin: 10px 0;
+            font-weight: normal;
+        }
+        #navigate-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ffb703;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #navigate-button:active {
+            background-color: #fb8500;
+        }
+    </style>
+</head>
+<body>
+    <button id="navigate-button" onclick="window.location.href='menuPrzedszkole.html'">Powrót</button>
+    <div class="container">
+        <h1>Jak należy zachowywać się w lesie</h1>
+        <div id="tekst" class="tekst"></div>
+        <button id="startButton">Start</button>
+        <div id="pytania" class="hidden">
+            <h2>Pytania</h2>
+            <div id="punkty" class="hidden">Liczba punktów: 0</div>
+            <div id="komunikat" class="hidden"></div>
+            <div id="pytanieContainer"></div>
+            <button id="nextButton" disabled>Następne pytanie</button>
+        </div>
+        <div id="wynik" class="hidden"></div>
+    </div>
+    <script>
+        const startButton = document.getElementById("startButton");
+        const pytaniaDiv = document.getElementById("pytania");
+        const pytanieContainer = document.getElementById("pytanieContainer");
+        const nextButton = document.getElementById("nextButton");
+        const wynikDiv = document.getElementById("wynik");
+        const punktyDiv = document.getElementById("punkty");
+        const komunikatDiv = document.getElementById("komunikat");
+
+        const pytania = [
+    {
+        pytanie: "Wybierz właściwe zachowanie w lesie",
+        opcje: { A: "https://img.freepik.com/darmowe-wektory/recznie-rysowane-ilustracja-sadzenia-drzew-w-plaskiej-konstrukcji_23-2149209145.jpg?t=st=1731527408~exp=1731531008~hmac=ebaffe4327fd1a4a8694490c71e663c65cd7f00f8cbab9323834c7125d97048e&w=826", B: "zdjecia/lamanie.png" },
+        poprawna: "A",
+        message: "Nie należy deptać roślin w lesie!"
+    },
+    {
+        pytanie: "Wybierz właściwe zachowanie w lesie",
+        opcje: { A: "https://img.freepik.com/premium-zdjecie/ilustracja-wektorowa-szczesliwego-chlopca_1180716-2354.jpg?ga=GA1.1.1119145447.1731515543&semt=ais_hybrid", B: "  https://img.freepik.com/premium-wektory/slodkie-dziecko-nastolatek-pokazuje-wyraz-twarzy-cisza_546897-346.jpg?w=826" },
+        poprawna: "B",
+        message: "Cisza w lesie jest ważna dla zwierząt!"
+    },
+    {
+        pytanie: "Wybierz właściwe zachowanie w lesie",
+        opcje: { A: "https://img.freepik.com/premium-wektory/odosobniona-scena-z-postacia-z-kreskowek-ludzi_1639-37132.jpg?ga=GA1.1.1119145447.1731515543&semt=ais_hybrid", B: "https://img.freepik.com/darmowe-wektory/mezczyzna-patrzac-na-stos-smieci-w-parku_1308-29877.jpg?ga=GA1.1.1119145447.1731515543&semt=ais_hybrid" },
+        poprawna: "A",
+        message: "Zabieranie plastikowych śmieci jest dobre dla naszej Ziemii!"
+    },
+    {
+        pytanie: "Wybierz właściwe zachowanie w lesie",
+        opcje: { A: "https://img.freepik.com/darmowe-wektory/szczesliwa-rodzina-w-samochodzie_1308-70976.jpg?ga=GA1.1.1119145447.1731515543&semt=ais_hybrid", B: "https://img.freepik.com/darmowe-zdjecie/dzieci-z-kreskowek-bawiace-sie-razem-na-swiezym-powietrzu_23-2151757173.jpg?ga=GA1.1.1119145447.1731515543&semt=ais_hybrid  " },
+        poprawna: "B",
+        message: "Jazda na rowerze jest dobra dla zdrowia!"
+    },
+    {
+        pytanie: "Wybierz właściwe zachowanie w lesie",
+        opcje: { A: "  https://img.freepik.com/premium-zdjecie/chlopiec-rozpalajacy-ogien-w-lesie_1198035-4759.jpg?ga=GA1.1.1119145447.1731515543&semt=ais_hybrid", B: "https://img.freepik.com/darmowe-wektory/ludzie-camping-recznie-rysowane-stylu_52683-17396.jpg?ga=GA1.1.1119145447.1731515543&semt=ais_hybrid" },
+        poprawna: "B",
+        message: "Nie wolno rozpalać ogniska w lesie!"
+    },
+    {
+        pytanie: "Wybierz właściwe zachowanie w lesie",
+        opcje: { A: "https://img.freepik.com/darmowe-wektory/obserwowanie-ptakow-z-chlopcem-i-dziewczyna_1308-31104.jpg?ga=GA1.1.1119145447.1731515543&semt=ais_hybrid", B: "https://img.freepik.com/darmowe-wektory/chlopiec-noszacy-sluchawki-z-redukcja-szumow_1308-52955.jpg?ga=GA1.1.1119145447.1731515543&semt=ais_hybrid" },
+        poprawna: "A",
+        message: "Cisza w lesie jest ważna dla zwierząt!"
+    },
+];
+
+
+
+        let aktualnePytanieIndex = 0;
+        let punkty = 0;
+        let selectedAnswer = null;
+
+        startButton.addEventListener("click", () => {
+            startButton.classList.add("hidden");
+            document.getElementById("tekst").classList.add("hidden");
+            pytaniaDiv.classList.remove("hidden");
+            punktyDiv.classList.remove("hidden");
+            komunikatDiv.classList.add("hidden");
+            pokazPytanie();
+        });
+
+        nextButton.addEventListener("click", () => {
+            if (selectedAnswer === pytania[aktualnePytanieIndex].poprawna) {
+                punkty++;
+                komunikatDiv.innerHTML = "✔️Poprawna odpowiedź!";
+            } else {
+                komunikatDiv.innerHTML = "❌Zła odpowiedź!";
+            }
+            punktyDiv.innerHTML = `Liczba punktów: ${punkty}`;
+            komunikatDiv.classList.remove("hidden");
+
+            aktualnePytanieIndex++;
+            if (aktualnePytanieIndex < pytania.length) {
+                pokazPytanie();
+            } else {
+                pokazWynik();
+            }
+        });
+
+        function pokazPytanie() {
+            const pytanie = pytania[aktualnePytanieIndex];
+            selectedAnswer = null;
+            pytanieContainer.innerHTML = `
+                <div class="pytanie">
+                    <h3>${pytanie.pytanie}</h3>
+                    <div class="option-container">
+                        ${Object.keys(pytanie.opcje).map(opcja => `
+                            <div class="option">
+                                <input type="radio" name="opcja" value="${opcja}" id="${opcja}">
+                                <label for="${opcja}">
+                                    <img src="${pytanie.opcje[opcja]}" alt="Option ${opcja}">
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            nextButton.disabled = true;
+            komunikatDiv.classList.add("hidden");
+
+            document.querySelectorAll('input[name="opcja"]').forEach(input => {
+                input.addEventListener("change", () => {
+                    selectedAnswer = input.value;
+                    nextButton.disabled = false;
+                });
+            });
+        }
+
+        function pokazWynik() {
+            pytaniaDiv.classList.add("hidden");
+            wynikDiv.classList.remove("hidden");
+            wynikDiv.innerHTML = `<h2>Koniec gry! Zdobyłeś ${punkty} na ${pytania.length} punktów.</h2>`;
+        }
+
+        punktyDiv.innerHTML = `Liczba punktów: ${punkty}`;
+    </script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gra - Sortowanie Śmieci</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('zdjecia/amazon.jpg');
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      color: #333;
+      min-height: 100vh;
+
+    }
+
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      max-width: 90%;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2e8b57;
+      text-shadow: 1px 1px 2px #fff;
+      text-align: center;
+    }
+
+    .status {
+      font-size: 18px;
+      color: #2e8b57;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .difficulty-select {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    .difficulty-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      color: white;
+      transition: 0.5s;
+    }
+    .difficulty-btn:hover{
+      transition: 0.5s;
+      scale: 110%;
+    }
+
+    .easy { background-color: #4caf50; }
+    .medium { background-color: #f1c40f; }
+    .hard { background-color: #e74c3c; }
+
+    .trash-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px;
+      background-color: #f0e68c;
+      border: 2px solid #bbb;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .trash-item {
+      padding: 5px 10px;
+      background-color: #fff;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .bins {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 450px; /* This width will make the bins wrap to the next row */
+}
+
+
+    .bin {
+      width: 130px;
+      height: 130px;
+      background-color: #eee;
+      border: 2px dashed #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      border-radius: 10px;
+      transition: background-color 0.3s;
+      color: white;
+    }
+
+    .bin[data-type="papier"] { background-color: #3498db; }
+    .bin[data-type="plastik"] { background-color: #f1c40f; }
+    .bin[data-type="szkło"] { background-color: #27ae60; }
+
+    .bin.over { background-color: #cce5ff; }
+
+    .hide { display: none; }
+    img{
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Media queries for mobile responsiveness */
+    @media (max-width: 768px) {
+      .title {
+        font-size: 20px;
+      }
+
+      .difficulty-btn {
+        font-size: 14px;
+        padding: 8px 15px;
+      }
+
+      .trash-box {
+        gap: 8px;
+      }
+
+      .trash-item {
+        font-size: 12px;
+        padding: 4px 8px;
+      }
+
+      .bin {
+        width: 80px;
+        height: 80px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .title {
+        font-size: 18px;
+      }
+
+      .difficulty-btn {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+
+      .trash-item {
+        font-size: 10px;
+        padding: 3px 6px;
+      }
+
+
+
+.tree {
+  width: 100%; /* Make the image fit inside the bin */
+  height: 100%; /* Ensure the image fits the bin's height */
+  object-fit: cover; /* This ensures the image keeps its aspect ratio and fills the space, cropping if necessary */
+}
+
+
+    }
+    #navigate-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ffb703;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #navigate-button:active {
+            background-color: #fb8500;
+        }
+   
+  </style>
+</head>
+<body>
+  <button id="navigate-button" onclick="window.location.href='main4-8.html'">Powrót do mapy</button>
+
+  <div class="game-container">
+    <div class="title">Dopasuj nazwy zwierząt do zdjęć</div>
+    <div class="status" id="status">❤❤❤❤</div>
+
+    <!-- Opcja wyboru poziomu trudności -->
+    <div class="difficulty-select">
+      <button class="difficulty-btn easy" onclick="selectDifficulty('easy')">Start</button>
+    </div>
+
+    <div class="trash-box"></div>
+    <div class="bins">
+      <div class="bin" data-type="anteater"><img class="tree" src="zdjecia/anteaterjpg.jpg" alt=""></div>
+      <div class="bin" data-type="caiman"><img class="tree" src="zdjecia/caiman.jpg" alt=""></div>
+      <div class="bin" data-type="pinkdolphin"><img class="tree" src="zdjecia/pinkdolphin.jpg" alt=""></div>
+      <div class="bin" data-type="capybara"><img class="tree" src="zdjecia/capybara.jpg" alt=""></div>
+      <div class="bin" data-type="kinkajou"><img class="tree" src="zdjecia/kinkajou.jpg" alt=""></div>
+      <div class="bin" data-type="jaguar"><img class="tree" src="zdjecia/jaguar.jpg" alt=""></div>
+      <div class="bin" data-type="eagle"><img class="tree" src="zdjecia/eagle.jpg" alt=""></div>
+      <div class="bin" data-type="tapir"><img class="tree" src="zdjecia/tapir.jpg" alt=""></div>
+      <div class="bin" data-type="emperror"><img class="tree" src="zdjecia/emperror.jpg" alt=""></div>
+      <div class="bin" data-type="ara"><img class="tree" src="zdjecia/ara.jpg" alt=""></div>
+      <div class="bin" data-type="leniwiec"><img class="tree" src="zdjecia/Leniwiec.jpg" alt=""></div>
+    </div>
+
+  <script>
+    const statusDisplay = document.getElementById('status');
+    const trashBox = document.querySelector('.trash-box');
+    const bins = document.querySelectorAll('.bin');
+    let lives = 4;
+    let correctCount = 0;
+    let draggedItem = null;
+
+    const trashItems = {
+      easy: [
+        { name: 'Kinkażu żółty', type: 'kinkajou' },
+        { name: 'Kajman czarny', type: 'caiman' },
+        { name: 'Jaguar', type: 'jaguar' },
+        { name: 'Ara', type: 'ara' },
+        { name: 'Harpia wielka', type: 'eagle' },
+        { name: 'Tamaryna cesarska', type: 'emperror' },
+        { name: 'Leniwiec', type: 'leniwiec' },
+        { name: 'Mrówkojad', type: 'anteater' },
+        { name: 'Tapir', type: 'tapir' },
+        { name: 'Kapibara', type: 'capybara' },
+        { name: 'Delfin różowy', type: 'pinkdolphin' }
+      ],};
+
+    function selectDifficulty(level) {
+      trashBox.innerHTML = '';
+      correctCount = 0;
+      lives = 4;
+      updateLives();
+      
+      trashItems[level].forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('trash-item');
+        div.setAttribute('draggable', 'true');
+        div.dataset.type = item.type;
+        div.textContent = item.name;
+        trashBox.appendChild(div);
+
+        div.addEventListener('dragstart', () => draggedItem = div);
+        div.addEventListener('dragend', () => draggedItem = null);
+      });
+    }
+
+    bins.forEach(bin => {
+      bin.addEventListener('dragover', event => event.preventDefault());
+      bin.addEventListener('drop', () => {
+        if (draggedItem && draggedItem.dataset.type === bin.dataset.type) {
+          updateStatus('Dobrze zrobione!');
+          draggedItem.remove();
+          correctCount++;
+          if (correctCount === 9) {
+            updateStatus('Super wykonane zadanie!');
+          }
+        } else {
+          lives--;
+          updateLives();
+          if (lives === 0) {
+            updateStatus('Koniec gry! Spróbuj ponownie.');
+            setTimeout(resetGame, 2000); // reset gry po 2 sekundach
+          }
+        }
+      });
+    });
+
+    function updateLives() {
+      statusDisplay.textContent = '❤'.repeat(lives);
+    }
+
+    function updateStatus(message) {
+      statusDisplay.textContent = message;
+    }
+
+    function resetGame() {
+      selectDifficulty('easy'); // resetuje grę na najłatwiejszy poziom
+    }
+  </script>
+</body>
+</html>

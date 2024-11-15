@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gra z pytaniami</title>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    background-image: url(zdjecia/tło.jpg);
+    color: #333; 
+    margin: 0;
+    padding: 20px;
+}
+.container {
+    max-width: 600px;
+    margin: auto;
+    text-align: center;
+    background: white; 
+    border-radius: 10px; /* Zaokrąglone rogi */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Cień */
+    padding: 20px; /* Wypełnienie */
+    margin-top: 20vh;
+}
+h1 {
+    color: #007acc; /* Kolor nagłówka */
+}
+.tekst {
+    margin: 20px 0;
+    font-size: 1.1em; /* Zwiększony rozmiar czcionki */
+}
+#navigate-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ffb703;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #navigate-button:active {
+            background-color: #fb8500;
+        }
+.pytanie {
+    margin: 20px 0;
+    font-weight: bold; /* Wytłuszczenie pytania */
+}
+#pytanieContainer {
+    height: 200px; /* Stała wysokość kontenera z pytaniami */
+    overflow-y: auto; /* Dodaj przewijanie, jeśli pytania są za wysokie */
+    border: 1px solid #ccc; /* Obramowanie */
+    border-radius: 5px; /* Zaokrąglone rogi kontenera */
+    padding: 10px; /* Wypełnienie */
+    background-color: #e7f3fe; /* Jasny niebieski kolor tła kontenera */
+}
+button {
+    padding: 10px 20px; /* Wypełnienie dla przycisków */
+    border: none; /* Bez obramowania */
+    border-radius: 5px; /* Zaokrąglone rogi przycisków */
+    background-color: #007acc; /* Niebieski kolor przycisków */
+    color: white; /* Biały kolor tekstu */
+    cursor: pointer; /* Kursor zmienia się na wskaźnik */
+    font-size: 1em; /* Rozmiar czcionki przycisku */
+    transition: background-color 0.3s; /* Płynne przejście koloru */
+}
+button:hover {
+    background-color: #005f99; /* Ciemniejszy niebieski przy najechaniu */
+}
+#nextButton:disabled {
+    background-color: #ddd; /* Kolor przycisku, gdy jest nieaktywny */
+    cursor: not-allowed; /* Wskazówka, że przycisk jest nieaktywny */
+}
+#komunikat {
+    margin: 10px 0;
+    font-weight: normal; /* Normalna waga czcionki dla komunikatu */
+}
+</style>
+</head>
+<body>
+    <button id="navigate-button" onclick="window.location.href='main4-8.html'">Powrót do mapy</button>
+
+    <div class="container">
+        <h1>Sprawdź swoją wiedzę</h1>
+        <div id="tekst" class="tekst">
+        </div>
+        <button id="startButton">Start</button>
+        <div id="pytania" class="hidden">
+            <h2>Pytania</h2>
+            <div id="punkty" class="hidden">Liczba punktów: 0</div>
+            <div id="komunikat" class="hidden"></div> <!-- Element do wyświetlania komunikatów -->
+            <div id="pytanieContainer"></div>
+            <button id="nextButton" disabled>Następne pytanie</button> <!-- Przyciski są początkowo nieaktywne -->
+        </div>
+        <div id="wynik" class="hidden"></div>
+    </div>
+    <script>
+        const startButton = document.getElementById("startButton");
+        const pytaniaDiv = document.getElementById("pytania");
+        const pytanieContainer = document.getElementById("pytanieContainer");
+        const nextButton = document.getElementById("nextButton");
+        const wynikDiv = document.getElementById("wynik");
+        const punktyDiv = document.getElementById("punkty");
+        const komunikatDiv = document.getElementById("komunikat");
+    
+        const pytania = [
+            {
+                pytanie: "Gdzie znajduje się Globalny Bank Nasion?",
+                opcje: { A: "Na Islandii", B: "W Rosji", C: "W Kanadzie", D: "W Norwegii" },
+                poprawna: "D"
+            },
+            {
+                pytanie: "Gdzie zlokalizowany jest kompleks Noor?",
+                opcje: { A: "W Algierii", B: "W Tunezji", C: "W Maroku", D: "W Egipcie" },
+                poprawna: "C"
+            },
+            {
+                pytanie: "Jakie działania są podejmowane, aby ochronić rafę?",
+                opcje: { A: " Zwiększenie liczby hoteli przy wybrzeżu", B: "Ograniczanie emisji gazów cieplarnianych", C: "Wzrost liczby połowów ryb", D: "Budowa dróg na rafie" },
+                poprawna: "B"
+            },
+            {
+                pytanie: "Co jest konieczne, aby zmniejszyć Wielką Pacyficzną Plamę Śmieci?",
+                opcje: { A: "Zwiększenie połowów ryb", B: "Promowanie recyklingu i ograniczenie produkcji plastiku", C: "Budowa nowych wysp", D: "Wzrost liczby żeglarzy" },
+                poprawna: "B"
+            },
+            {
+                pytanie: "Jakie technologie pomagają w walce z kłusownictwem?",
+                opcje: { A: "Samoloty komercyjne", B: "Tradycyjne pułapki", C: "Samochody wyścigowe", D: "Drony i systemy śledzenia" },
+                poprawna: "D"
+            },
+            {
+                pytanie: "Dlaczego Bank Nasion nazywany jest 'Arką Noego dla roślin'?",
+                opcje: { A: "Bo przechowuje nasiona roślin z całego świata", B: "Bo dostarcza nasiona do uprawy", C: "Bo skupia się na jednym gatunku roślin", D: "Bo służy tylko krajom europejskim" },
+                poprawna: "A"
+            },
+            {
+                pytanie: "Co jest główną przyczyną wycinki lasów deszczowych w Brazylii?",
+                opcje: { A: "Turystyka", B: "Uprawy rolne i hodowla bydła", C: "Wydobycie minerałów", D: "Zmiana klimatu" },
+                poprawna: "B"
+            },
+            {
+                pytanie: "Co jest głównym celem Hornsea Project?",
+                opcje: { A: "Produkcja energii z węgla", B: "Zwiększenie liczby turbin na lądzie", C: "Redukcja emisji dwutlenku węgla", D: "Import energii" },
+                poprawna: "C"
+            },
+            {
+                pytanie: "Gdzie znajduje się Tama Trzech Przełomów?",
+                opcje: { A: "W Chinach", B: "W Japonii", C: "W Australii", D: "W Rosji" },
+                poprawna: "A"
+            },
+            {
+                pytanie: "W jakim celu Singapur wprowadza technologie odnawialne?",
+                opcje: { A: "Aby przyciągnąć turystów", B: "Aby zmniejszyć populację", C: "Aby zmniejszyć koszty produkcji przemysłowej", D: "Aby być bardziej samowystarczalnym" },
+                poprawna: "D"
+            },
+            {
+                pytanie: "Co zagraża Wielkiej Rafie Koralowej?",
+                opcje: { A: "Zmiany klimatyczne i zanieczyszczenie", B: "Brak turystów", C: "Wzrost liczby koralowców", D: "Obniżenie poziomu mórz" },
+                poprawna: "A"
+            },
+            {
+                pytanie: "Dlaczego Sahara jest idealnym miejscem dla farm słonecznych?",
+                opcje: { A: "Ma najwięcej opadów", B: "Jest najbardziej zaludniona", C: "Ma wysokie nasłonecznienie", D: "Jest pokryta roślinnością" },
+                poprawna: "C"
+            },
+            {
+                pytanie: "Co powoduje topnienie lodowców na Antarktydzie?",
+                opcje: { A: "Obniżenie temperatury", B: "Podwyższenie globalnej temperatury", C: "Mniej opadów deszczu", D: "Brak pingwinów" },
+                poprawna: "B"
+            },
+            {
+                pytanie: "Co jest głównym celem kłusowników w Afryce?",
+                opcje: { A: "Poławianie zwierząt dla cennych tuszy, rogów i skór", B: "Polowanie na zwierzęta w celach sportowych", C: "Zbieranie roślin", D: "Tworzenie rezerwatów przyrody" },
+                poprawna: "A"
+            },
+            {
+                pytanie: "Co oznacza określenie 'płuca Ziemi' w odniesieniu do lasów Amazonii?",
+                opcje: { A: "Lasy Amazonii pochłaniają dwutlenek węgla", B: "Lasy Amazonii wytwarzają wodę pitną dla świata", C: "Lasy Amazonii produkują tlen, który zasila atmosferę", D: "Lasy Amazonii tworzą ozon  wygeneruj taki teksty i pytanie " },
+                poprawna: "C"
+            },
+            {
+                pytanie: "Jaki jest główny cel budowy tamy w Chinach?",
+                opcje: { A: "Poprawa jakości powietrza i produkcja energii odnawialnej", B: "Zwiększenie zużycia paliw kopalnych", C: "Budowa nowego miasta", D: "Wzrost emisji dwutlenku węgla" },
+                poprawna: "A"
+            },
+            {
+                pytanie: "Jaką energię generuje Hornsea Project?",
+                opcje: { A: "Słoneczną", B: "Wiatrową", C: "Jądrową", D: "Węglową" },
+                poprawna: "B"
+            },
+            {
+                pytanie: "Jakie działanie jest kluczowe dla ochrony Antarktydy?",
+                opcje: { A: "Import zwierząt z innych kontynentów", B: "Budowa tam na lodowcach", C: "Budowa miast na lodzie", D: "Redukcja emisji gazów cieplarnianych" },
+                poprawna: "D"
+            },
+            {
+                pytanie: "Jakie są skutki obecności wyspy śmieci dla organizmów wodnych?",
+                opcje: { A: "Poprawia ich zdrowie", B: "Dostarcza pożywienia", C: "Powoduje zatrucia i szkody zdrowotne", D: "Zwiększa populację ryb" },
+                poprawna: "C"
+            },
+            {
+                pytanie: "Jakie inicjatywy ekologiczne są popularne w Singapurze?",
+                opcje: { A: "Zwiększanie liczby dróg", B: "Zielone dachy i parki pionowe", C: "Budowa wieżowców", D: "Wycinka lasów" },
+                poprawna: "B"
+            },
+            // More questions here...
+        ];
+    
+        let aktualnePytanieIndex = 0;
+        let punkty = 0;
+        let selectedAnswer = null;
+    
+        startButton.addEventListener("click", () => {
+            startButton.classList.add("hidden");
+            document.getElementById("tekst").classList.add("hidden");
+            pytaniaDiv.classList.remove("hidden");
+            punktyDiv.classList.remove("hidden");
+            komunikatDiv.classList.add("hidden");
+            pokazPytanie();
+        });
+    
+        nextButton.addEventListener("click", () => {
+            if (selectedAnswer === pytania[aktualnePytanieIndex].poprawna) {
+                punkty++;
+                komunikatDiv.innerHTML = "Poprawna odpowiedź!";
+            } else {
+                komunikatDiv.innerHTML = "Zła odpowiedź!";
+            }
+            punktyDiv.innerHTML = `Liczba punktów: ${punkty}`;
+            komunikatDiv.classList.remove("hidden");
+    
+            aktualnePytanieIndex++;
+            if (aktualnePytanieIndex < pytania.length) {
+                pokazPytanie();
+            } else {
+                pokazWynik();
+            }
+        });
+    
+        function pokazPytanie() {
+            const pytanie = pytania[aktualnePytanieIndex];
+            selectedAnswer = null; // Reset the selected answer
+            pytanieContainer.innerHTML = `
+                <div class="pytanie">
+                    <h3>${pytanie.pytanie}</h3>
+                    ${Object.keys(pytanie.opcje).map(opcja => `
+                        <div>
+                            <input type="radio" name="opcja" value="${opcja}" id="${opcja}">
+                            <label for="${opcja}">${opcja}: ${pytanie.opcje[opcja]}</label>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            nextButton.disabled = true;
+            komunikatDiv.classList.add("hidden");
+    
+            document.querySelectorAll('input[name="opcja"]').forEach(input => {
+                input.addEventListener("change", () => {
+                    selectedAnswer = input.value;
+                    nextButton.disabled = false;
+                });
+            });
+        }
+    
+        function pokazWynik() {
+            pytaniaDiv.classList.add("hidden");
+            wynikDiv.classList.remove("hidden");
+            wynikDiv.innerHTML = `<h2>Koniec gry! Zdobyłeś ${punkty} punktów z ${pytania.length} pytań.</h2>`;
+        }
+    
+        punktyDiv.innerHTML = `Liczba punktów: ${punkty}`;
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,360 @@
+ <!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gra Edukacyjna - Klasy 1-3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url(zdjecia/kaktus.jpg);
+        }
+
+        .game-container {
+            width: 90%;
+            max-width: 700px;
+            background-color: #ffffffda;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .game-header {
+            margin-bottom: 20px;
+        }
+
+        .level-selection {
+            margin-bottom: 20px;
+        }
+
+        .level-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: 0.5s;
+        }
+
+        .level-btn:hover {
+            scale: 110%;
+            transition: 0.5s;
+        }
+
+        .tasks {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-radius: 8px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .answer-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .answer-btn:hover {
+            background-color: #45a049;
+            transition: 0.2s;
+            scale: 103%;
+        }
+       
+
+        .puzzle-container {
+            margin-top: 20px;
+        }
+
+        .puzzle {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 1fr); /* Adjusted for 3 rows */
+            gap: 0;
+        }
+
+        .puzzle-piece {
+            width: 100%;
+            aspect-ratio: 4 / 3; /* Keeps the aspect ratio of each piece */
+            background-image: url('pic1.png'); /* Use your image path */
+            background-size: 400% 300%; /* Matches the 4x3 grid */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .puzzle-piece.revealed {
+            opacity: 1;
+        }
+
+        /* Background position adjustments for each piece */
+        .puzzle-piece:nth-child(1) { background-position: 0% 0%; }
+        .puzzle-piece:nth-child(2) { background-position: 33.33% 0%; }
+        .puzzle-piece:nth-child(3) { background-position: 66.66% 0%; }
+        .puzzle-piece:nth-child(4) { background-position: 100% 0%; }
+        .puzzle-piece:nth-child(5) { background-position: 0% 50%; }
+        .puzzle-piece:nth-child(6) { background-position: 33.33% 50%; }
+        .puzzle-piece:nth-child(7) { background-position: 66.66% 50%; }
+        .puzzle-piece:nth-child(8) { background-position: 100% 50%; }
+        .puzzle-piece:nth-child(9) { background-position: 0% 100%; }
+        .puzzle-piece:nth-child(10) { background-position: 33.33% 100%; }
+        .puzzle-piece:nth-child(11) { background-position: 66.66% 100%; }
+        .puzzle-piece:nth-child(12) { background-position: 100% 100%; }
+
+        .reset-game {
+            background-color: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .reset-game:hover {
+            background-color: #d32f2f;
+        }
+        .wrong{
+            color: black;
+            border-radius: 7px;
+            margin-bottom: 30px;
+            margin-top: 30px;
+            font-weight: bolder;
+           
+        }
+        .easy { background-color: #4caf50; }
+    .medium { background-color: #f1c40f; }
+    .hard { background-color: #e74c3c; }
+    #navigate-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ffb703;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #navigate-button:active {
+            background-color: #fb8500;
+        }
+    </style>
+</head>
+<body>
+    <button id="navigate-button" onclick="window.location.href='menu1-3.html'">Powrót</button>
+
+    <div class="game-container">
+        <header class="game-header">
+            <h1>Witaj w Edukacyjnej Grze!</h1>
+            <p>Rozwiąż zadania i odkryj obrazek!</p>
+        </header>
+
+        <section class="level-selection">
+            <h2>Wybierz poziom trudności</h2>
+            <button class="level-btn easy" data-level="easy">Łatwy</button>
+            <button class="level-btn medium" data-level="medium">Średni</button>
+            <button class="level-btn hard" data-level="hard">Trudny</button>
+        </section>
+
+        <section class="tasks">
+            <h2>Twoje zadanie:</h2>
+            <div id="task-content" class="task-content"></div>
+            <div class="answers">
+                <button class="answer-btn" data-answer="A">A</button>
+                <button class="answer-btn" data-answer="B">B</button>
+                <button class="answer-btn" data-answer="C">C</button>
+                <button class="answer-btn" data-answer="D">D</button>
+                <section class="wrong">
+                    <h1>Niestety, to nie jest poprawna odpowiedź. Spróbuj ponownie</h1>
+                </section>
+            </div>
+        </section>
+
+        <section class="puzzle-container">
+            <h2>Twój postęp:</h2>
+            <div class="puzzle">
+                <div class="puzzle-piece" data-piece="1"></div>
+                <div class="puzzle-piece" data-piece="2"></div>
+                <div class="puzzle-piece" data-piece="3"></div>
+                <div class="puzzle-piece" data-piece="4"></div>
+                <div class="puzzle-piece" data-piece="5"></div>
+                <div class="puzzle-piece" data-piece="6"></div>
+                <div class="puzzle-piece" data-piece="7"></div>
+                <div class="puzzle-piece" data-piece="8"></div>
+                <div class="puzzle-piece" data-piece="9"></div>
+                <div class="puzzle-piece" data-piece="10"></div>
+                <div class="puzzle-piece" data-piece="11"></div>
+                <div class="puzzle-piece" data-piece="12"></div>
+            </div>
+        </section>
+       
+
+        <button class="reset-game">Zresetuj grę</button>
+    </div>
+
+    <script>
+        document.querySelectorAll('.wrong').forEach(el => el.style.display = 'none');
+        let currentLevel = '';
+        let currentTaskIndex = 0;
+        let tasks = [];
+
+        const taskContent = document.getElementById('task-content');
+        const resetGameBtn = document.querySelector('.reset-game');
+        const answerButtons = document.querySelectorAll('.answer-btn');
+        const levelButtons = document.querySelectorAll('.level-btn');
+        const puzzlePieces = document.querySelectorAll('.puzzle-piece');
+
+        function generateQuestions(level) {
+    const questions = [];
+
+    if (level === 'easy') {
+        const easyQuestions = [
+            { question: "Jakiego koloru jest pojemnik na papier?", options: { A: "Niebieski", B: "Zielony", C: "Czerwony", D: "Żółty" }, correct: "A" },
+            { question: "Co należy wrzucać do zielonego pojemnika?", options: { A: "Plastik", B: "Szkło", C: "Papier", D: "Metal" }, correct: "B" },
+            { question: "Który z poniższych materiałów najlepiej nadaje się do recyklingu?", options: { A: "Szkło", B: "Styropian", C: "Folia aluminiowa", D: "Jednorazowe opakowania" }, correct: "A" },
+            { question: "Co jest lepsze dla środowiska?", options: { A: "Używanie plastikowych toreb", B: "Używanie wielorazowych toreb", C: "Używanie papierowych torebek", D: "Kupowanie nowych toreb za każdym razem" }, correct: "B" },
+            { question: "Które z tych zwierząt żyje w lesie?", options: { A: "Lew", B: "Słoń", C: "Wilk", D: "Pingwin" }, correct: "C" },
+            { question: "Jakie zwierzę jest symbolem ochrony przyrody?", options: { A: "Niedźwiedź polarny", B: "Panda", C: "Żółw", D: "Delfin" }, correct: "B" },
+            { question: "Dlaczego warto sadzić drzewa?", options: { A: "Bo ładnie wyglądają", B: "Dają tlen", C: "Można się pod nimi schować", D: "Żeby ptaki miały gniazda" }, correct: "B" },
+            { question: "Który z tych produktów rozkłada się najkrócej?", options: { A: "Plastikowa butelka", B: "Papierowa torba", C: "Aluminiowa puszka", D: "Szklana butelka" }, correct: "B" },
+            { question: "Co oznacza symbol z trzema strzałkami tworzącymi trójkąt?", options: { A: "Produkt jednorazowy", B: "Produkt biodegradowalny", C: "Produkt można recyklingować", D: "Produkt łatwopalny" }, correct: "C" },
+            { question: "Jaką wodę najlepiej oszczędzać?", options: { A: "Krystaliczną", B: "Ciepłą", C: "Pitną", D: "Słoną" }, correct: "C" },
+            { question: "Jaki materiał można kompostować?", options: { A: "Plastik", B: "Szkło", C: "Skórki owoców", D: "Metal" }, correct: "C" },
+            { question: "Co można zrobić z butelką plastikową po wypiciu napoju?", options: { A: "Wrzucić do śmieci zmieszanych", B: "Oddać do recyklingu", C: "Zostawić na chodniku", D: "Zgnieść i wyrzucić do szkła" }, correct: "B" }
+        ];
+        questions.push(...easyQuestions);
+
+    } else if (level === 'medium') {
+        const mediumQuestions = [
+            { question: "Dlaczego pszczoły są ważne dla przyrody?", options: { A: "Robią miód", B: "Zapylają rośliny", C: "Odstraszają owady", D: "Są kolorowe" }, correct: "B" },
+            { question: "Jak możemy oszczędzać wodę?", options: { A: "Kąpiąc się codziennie w wannie", B: "Zakładając oszczędne końcówki na kran", C: "Myjąc auto w domu", D: "Zostawiając kran otwarty podczas mycia zębów" }, correct: "B" },
+            { question: "Co oznacza znak recyklingu?", options: { A: "Produkt jest drogi", B: "Produkt jednorazowy", C: "Produkt można przetworzyć", D: "Produkt jest niebezpieczny" }, correct: "C" },
+            { question: "Dlaczego ważne jest segregowanie śmieci?", options: { A: "Żeby śmieci się lepiej układały", B: "Żeby można było odzyskać surowce", C: "Bo jest więcej kolorów pojemników", D: "Bo łatwiej się sprząta" }, correct: "B" },
+            { question: "Co można kompostować?", options: { A: "Szklane butelki", B: "Skórki owoców", C: "Plastikowe opakowania", D: "Metalowe puszki" }, correct: "B" },
+            { question: "Jakie zwierzęta pomagają w zapylaniu roślin?", options: { A: "Mrówki", B: "Motyle", C: "Pająki", D: "Żaby" }, correct: "B" },
+            { question: "Która z energii jest odnawialna?", options: { A: "Energia z węgla", B: "Energia słoneczna", C: "Energia jądrowa", D: "Energia benzyny" }, correct: "B" },
+            { question: "Który materiał jest biodegradowalny?", options: { A: "Plastik", B: "Papier", C: "Aluminium", D: "Szkło" }, correct: "B" },
+            { question: "Dlaczego należy ograniczać emisję CO₂?", options: { A: "Wzmaga zmianę klimatu", B: "Pogarsza jakość wody", C: "Zmniejsza poziom tlenu", D: "Jest niewidoczny" }, correct: "A" },
+            { question: "Co można zrobić, aby zmniejszyć zużycie energii elektrycznej?", options: { A: "Używać energooszczędnych żarówek", B: "Zostawiać światło włączone", C: "Nie wyłączać urządzeń", D: "Używać starego sprzętu" }, correct: "A" },
+            { question: "Dlaczego powinniśmy ograniczać używanie jednorazowych plastików?", options: { A: "Są łatwe do utylizacji", B: "Zaśmiecają środowisko", C: "Są tanie", D: "Zawsze można je przetworzyć" }, correct: "B" },
+            { question: "Jakie drzewo jest symbolem ochrony środowiska?", options: { A: "Sosna", B: "Dąb", C: "Sekwoja", D: "Brzoza" }, correct: "B" }
+        ];
+        questions.push(...mediumQuestions);
+
+    } else if (level === 'hard') {
+        const hardQuestions = [
+            { question: "Które gazy przyczyniają się do efektu cieplarnianego?", options: { A: "Tlen", B: "Dwutlenek węgla", C: "Hel", D: "Azot" }, correct: "B" },
+            { question: "Jak zmniejszyć ilość odpadów plastikowych?", options: { A: "Używając plastikowych toreb", B: "Kupując napoje w plastiku", C: "Segregując odpady", D: "Korzystając z wielorazowych butelek" }, correct: "D" },
+            { question: "Które materiały rozkładają się najszybciej?", options: { A: "Plastik", B: "Szkło", C: "Papier", D: "Aluminium" }, correct: "C" },
+            { question: "Dlaczego lasy są nazywane 'płucami Ziemi'?", options: { A: "Produkują tlen", B: "Produkują azot", C: "Pochłaniają deszcz", D: "Chłodzą klimat" }, correct: "A" },
+            // Dodaj więcej pytań zaawansowanych tutaj
+        ];
+        questions.push(...hardQuestions);
+    }
+
+    return questions;
+}
+
+        function startGame() {
+            tasks = generateQuestions(currentLevel);
+            currentTaskIndex = 0;
+            puzzlePieces.forEach(piece => piece.classList.remove('revealed'));
+            displayTask();
+        }
+
+        function displayTask() {
+            const task = tasks[currentTaskIndex];
+            taskContent.innerHTML = `<p>${task.question}</p>`;
+
+            document.querySelector('.answer-btn[data-answer="A"]').textContent = `A: ${task.options.A}`;
+            document.querySelector('.answer-btn[data-answer="B"]').textContent = `B: ${task.options.B}`;
+            document.querySelector('.answer-btn[data-answer="C"]').textContent = `C: ${task.options.C}`;
+            document.querySelector('.answer-btn[data-answer="D"]').textContent = `D: ${task.options.D}`;
+        }
+
+        levelButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                currentLevel = button.dataset.level;
+                startGame();
+            });
+        });
+
+        answerButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                checkAnswer(button.getAttribute('data-answer'));
+            });
+        });
+
+        function checkAnswer(selectedAnswer) {
+            const correctAnswer = tasks[currentTaskIndex].correct;
+
+            if (selectedAnswer === correctAnswer) {
+                const currentPuzzlePiece = puzzlePieces[currentTaskIndex];
+                currentPuzzlePiece.classList.add('revealed');
+                currentTaskIndex++;
+
+                if (currentTaskIndex < tasks.length) {
+                    displayTask();
+                } else {
+                    taskContent.innerHTML = '<p>Gratulacje! Ukończyłeś wszystkie zadania i odkryłeś cały obrazek!</p>';
+                    answerButtons.forEach(button => button.disabled = true);
+                }
+            } else {
+                document.querySelectorAll('.wrong').forEach(el => {
+    el.style.display = 'none'; // Ukryj element na początku
+    el.style.display = 'block'; // Pokaż element
+    setTimeout(() => {
+        el.style.display = 'none'; // Ukryj element po 1 sekundzie
+    }, 2500); // 1000 ms = 1 sekunda
+});
+            }
+        }
+
+        resetGameBtn.addEventListener('click', resetGame);
+
+        function resetGame() {
+            currentTaskIndex = 0;
+            answerButtons.forEach(button => button.disabled = false);
+            puzzlePieces.forEach(piece => piece.classList.remove('revealed'));
+            taskContent.innerHTML = '';
+        }
+    </script>
+</body>
+</html> 
+
+
+
+
+

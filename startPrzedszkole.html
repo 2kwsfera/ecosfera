@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Witaj w Twojej Grze</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> 
+    <style>
+        body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column; /* Umożliwia rozmieszczenie elementów w kolumnie */
+    justify-content: flex-start; /* Wyrównuje tekst do góry */
+    align-items: center;
+    background: url('zdjecia/Earth\ Day.gif') no-repeat center center fixed;
+    background-size: cover;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+h1 {
+    margin-top: 200px; /* Większa przerwa od góry */
+    font-size: 60px; /* Większy rozmiar czcionki */
+    text-align: center;
+    margin-bottom: 200px;
+}
+
+.container {
+    
+    display: flex;
+    justify-content: center; /* Wyśrodkowuje przycisk */
+    align-items: center; /* Wyśrodkowuje przycisk w pionie */
+}
+
+button {
+    padding: 30px 45px;
+    font-size: 30px;
+    color: white;
+    background-color: rgba(40, 167, 69, 0.8); /* Półprzezroczysty zielony kolor przycisku */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: rgb(20, 96, 38); /* Ciemniejszy zielony kolor przycisku po najechaniu */
+}
+
+button i {
+    margin-right: 10px; /* Przestrzeń między ikoną a tekstem */
+}
+#navigate-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ffb703;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #navigate-button:active {
+            background-color: #fb8500;
+        }
+    </style>
+</head>
+<body>
+    <button id="navigate-button" onclick="window.location.href='index.html'">Zmiana poziomu</button>
+
+    <h1>Witaj w Ecosfera</h1>
+    <div class="container">
+        <button id="startButton">
+            <i class="fas fa-arrow-right">Zagraj</i> 
+        </button>
+    </div>
+
+    <script>
+        document.getElementById('startButton').addEventListener('click', function() {
+    window.location.href = 'menuPrzedszkole.html'; 
+});
+
+    </script>
+</body>
+</html>

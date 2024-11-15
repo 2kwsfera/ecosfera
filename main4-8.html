@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz o Klimacie i Środowisku - Mapa Świata</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Podstawowe stylowanie całej strony */
+body {
+    font-family: 'Comic Sans MS', cursive, sans-serif; /* Radosna czcionka */
+    background-color: #e9f5fd; /* Jasnozielone tło */
+    margin: 0;
+    padding: 0;
+}
+@media (max-width: 768px) {
+    #mapContainer {
+        width: 95%; /* Maintain width on mobile */
+        max-width: 800px; /* Set a smaller max-width for mobile screens */
+    }
+}
+
+
+
+
+/* Stylowanie sekcji mapy */
+.map-screen {
+    text-align: center; /* Wyśrodkowanie tekstu */
+    padding: 20px;
+    border-bottom-left-radius: 15px; /* Zaokrąglenie rogów */
+    border-bottom-right-radius: 15px; /* Zaokrąglenie rogów */
+    background-color: #e9f5fd; /* Białe tło sekcji */
+}
+
+/* Nagłówek */
+h1 {
+    color: #388e3c; /* Ciemnozielony kolor nagłówka */
+    font-size: 2.5em; /* Rozmiar nagłówka */
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px #ffffff; /* Cień tekstu */
+}
+
+/* Kontener mapy */
+#mapContainer {
+    position: relative;
+    width: 100%; /* Full width to cover the screen */
+    max-width: 1300px; /* Increase the maximum width for larger screens */
+    margin: 0 auto;
+    border-radius: 15px; /* Rounded corners */
+    margin-bottom: 5vh;
+}
+
+/* Mapa */
+#worldMap {
+    width: 100%;
+    border-radius: 15px; /* Rounded corners */
+}
+
+
+
+
+
+
+/* Stylowanie czerwonej pinezki */
+/* Stylowanie czerwonej pinezki */
+.marker.red {
+    background-color: red; /* Czerwony kolor pinezki */
+}
+
+/* Stylowanie zielonej pinezki */
+.marker.green {
+    background-color: green; /* Zielony kolor pinezki */
+}
+
+
+/* Stylowanie pinezki */
+.marker {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    transform: translate(-50%, -50%); /* Centrowanie pinezki */
+}
+
+.marker:hover {
+    background-color: #4c00ff; /* Zmiana koloru po najechaniu */
+    transform: translate(-50%, -50%) scale(1.2); /* Powiększenie pinezki */
+}
+
+
+
+#lessonTitle {
+    color: #4caf50; /* Zielony kolor nagłówka lekcji */
+    margin-bottom: 10px;
+    font-size: 1.8em; /* Rozmiar nagłówka lekcji */
+}
+
+#lessonText {
+    color: #333; /* Kolor tekstu */
+    font-size: 1.2em; /* Rozmiar tekstu */
+    margin-bottom: 8vh;
+}
+
+
+
+
+#lessonContainer {
+    display: none; /* Ukryj domyślnie */
+    margin-top: 20px;
+    padding: 20px;
+    border: 2px solid #4c72af; /* Zielona ramka */
+    border-radius: 10px;
+    background-color: #ffffff; /* Białe tło dla lekcji */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Cień */
+    transition: opacity 0.5s ease-in-out; /* Płynna animacja dla kontenera lekcji */
+    position: relative;
+    width: 100%; /* Full width to cover the screen */
+    max-width: 1300px; /* Increase the maximum width for larger screens */
+    margin: 0 auto;
+}
+
+#lessonContainer.visible {
+    display: block; /* Pokaż, gdy jest widoczny */
+    opacity: 1; /* Ustaw przezroczystość na 1 */
+}
+
+#lessonContainer.hidden {
+    opacity: 0; /* Ustaw przezroczystość na 0 */
+}
+
+canvas{
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
+#navigate-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #ffb703;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+#navigate-button:active {
+    background-color: #fb8500;
+}
+#navig-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ffb703;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+#navig-button:active {
+    background-color: #fb8500;
+}
+#nextButton{
+    position: absolute;
+    background-color: #ffb703;
+    color: white;
+    border: none;
+    bottom: 5vh;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+  </style>
+</head>
+<body>
+  <button id="navigate-button" onclick="window.location.href='index.html'">Zmiana poziomu</button>
+  <button id="navig-button" onclick="window.location.href='test.html'">Sprawdź swoją wiedzę</button>
+
+  <section class="map-screen">
+    <h1>Przykłady pozytywnych  i negatywnych działań na środowisko</h1>
+    <section id="mapContainer">
+      <img src="zdjecia/mapa.png" alt="Mapa Świata" id="worldMap">
+    </section>
+    <div id="lessonContainer" class="hidden">
+      <h2 id="lessonTitle">Lekcja</h2>
+      <p id="lessonText">Kliknij na kraj, aby rozpocząć lekcję o klimacie i środowisku.</p>
+      <button id="nextButton">Dalej</button>
+    </div>
+<section id="questionContainer" class="hidden">
+  <h2>Question</h2>
+  <p id="questionText"></p>
+  <ul id="answersList">
+      <li><button class="answerBtn">A</button></li>
+      <li><button class="answerBtn">B</button></li>
+      <li><button class="answerBtn">C</button></li>
+      <li><button class="answerBtn">D</button></li>
+  </ul>
+</section>
+
+  </section>
+
+
+
+  
+  <script>
+    const points = [
+    { country: "Norway", top: "6%", left: "51%", color: "green" },
+    { country: "Sweden", top: "17%", left: "48%", color: "green" },
+    { country: "Brazil", top: "52%", left: "30%", color: "red" },
+    { country: "Sahara", top: "34%", left: "51%", color: "green" },
+    { country: "Singapore", top: "49%", left: "75%", color: "green" },
+    { country: "China", top: "34%", left: "78%", color: "green" },
+    { country: "Australia", top: "61%", left: "88%", color: "red" },
+    { country: "Antarctica (East)", top: "93%", left: "66%", color: "red" },
+    { country: "Pacific Ocean", top: "35%", left: "9%", color: "red" },
+    { country: "South Africa", top: "55%", left: "55%", color: "red" }
+];
+
+let visitedCountries = []; // Initialize visited countries
+let currentCountry = ''; // Global variable to store the current country
+
+const lessons = {
+    "Norway": { title: "Norwegia: Globalny Bank Nasion na Wyspie Spitsbergen", content: "Norwegia jest domem dla jednego z najważniejszych projektów ochrony bioróżnorodności Globalnego Banku Nasion, zlokalizowanego na wyspie Spitsbergen w archipelagu Svalbard. Bank, często nazywany 'Arką Noego dla roślin', przechowuje nasiona roślin z całego świata. W bunkrze zbudowanym głęboko w górze przechowywanych jest ponad milion próbek nasion, reprezentujących ogromną różnorodność biologiczną. Głównym celem Banku jest zachowanie gatunków roślin na wypadek klęsk żywiołowych, zmian klimatycznych, wojen czy innych zagrożeń. Inicjatywa ta jest kluczowa, ponieważ wiele roślin, które dostarczają żywność i surowce, jest zagrożonych wyginięciem. Bank wspiera globalne bezpieczeństwo żywnościowe, zapewniając, że nasiona te mogą zostać wykorzystane do ponownego wprowadzenia roślin do środowiska, gdyby były potrzebne. Projekt jest wspierany przez wiele krajów i organizacji, które również przysyłają nasiona z różnych regionów świata, by zapewnić ich ochronę na przyszłość." },
+    "Sweden": { title: "Wielka Brytania: gigantyczna farma wiatrowa", content: "Wybrzeże Yorkshire w Wielkiej Brytanii jest miejscem jednej z największych farm wiatrowych na świecie – Hornsea Project. Farma ta generuje ogromne ilości energii odnawialnej, zasilając setki tysięcy domów i redukując zależność od paliw kopalnych. Turbiny wiatrowe na farmie są jednymi z największych i najnowocześniejszych, a ich produkcja energii przyczynia się do obniżenia emisji dwutlenku węgla w regionie. Hornsea Project jest częścią ambitnego planu Wielkiej Brytanii, aby zwiększyć produkcję energii ze źródeł odnawialnych. Farma wiatrowa na morzu jest przykładem efektywnego wykorzystania zasobów naturalnych oraz innowacji technologicznych, które pomagają w walce ze zmianami klimatycznymi." },
+    "Brazil": { title: "Brazylia: zielone płuca Ziemii ", content: "Lasy deszczowe w Brazylii są jednym z najważniejszych ekosystemów na Ziemii. Amazonia obejmuje około 6 milionów km², co stanowi około 60% całkowitej powierzchni lasów deszczowych na świecie. To miejsce pełne życia, zamieszkiwane przez miliony gatunków roślin i zwierząt, z których wiele nie występuje nigdzie indziej. Amazonia jest nazywana 'płucami Ziemi', ponieważ produkuje około 20% tlenu na naszej planecie. Lasy te pełnią niezwykle ważną rolę w regulowaniu klimatu. Wchłaniają ogromne ilości dwutlenku węgla, pomagając zmniejszyć jego stężenie w atmosferze. Ponadto, drzewa w lasach deszczowych uczestniczą w cyklu wody, produkując opady deszczu, które mają wpływ na rolnictwo i klimat w wielu regionach świata, nie tylko w Brazylii. Niestety, w ciągu ostatnich kilku dziesięcioleci lasy Amazonii są systematycznie wycinane. Główne przyczyny to rolnictwo, w tym uprawy soi i hodowla bydła, a także nielegalne pozyskiwanie drewna. Co roku znikają tysiące kilometrów kwadratowych lasów, co prowadzi do poważnych konsekwencji ekologicznych. W wyniku wycinki, wiele gatunków roślin i zwierząt traci swoje naturalne siedliska, a niektóre z nich narażone są na wyginięcie. Dodatkowo wycinanie lasów przyczynia się do zwiększenia efektu cieplarnianego. W odpowiedzi na problem wycinki lasów Amazonii, wprowadzono szereg działań ochronnych. Tworzone są rezerwaty przyrody i parki narodowe, w których wycinka jest zabroniona. Jednak mimo tych inicjatyw, wycinka lasów wciąż trwa, a walka o ochronę Amazonii pozostaje jednym z najważniejszych wyzwań ekologicznych XXI wieku." },
+    "Sahara": { title: "Sahara: potencjał energetyczny z paneli słonecznych", content: "Sahara, największa pustynia na świecie, staje się miejscem zainteresowania dla projektów związanych z energią odnawialną. Obszar ten, pokrywający znaczną część Afryki Północnej, jest idealnym miejscem do produkcji energii słonecznej dzięki dużemu nasłonecznieniu przez cały rok. Kilka krajów, w tym Maroko, rozwija projekty budowy ogromnych farm fotowoltaicznych na pustyni. Jedna z największych takich instalacji to kompleks Noor, który generuje energię na potrzeby krajów Afryki i Europy. Te projekty mają potencjał do zaspokojenia znacznej części globalnego zapotrzebowania na energię i mogą przyczynić się do redukcji emisji dwutlenku węgla. Energia słoneczna z Sahary jest postrzegana jako przyszłość dla czystej energii, która nie tylko dostarcza prąd, ale także tworzy miejsca pracy i wspiera lokalny rozwój gospodarczy." },
+    "Singapore": { title: "Singapur: zielone miasto przyszłości", content: "Singapur, jedno z najmniejszych państw świata, jest znane z imponujących inicjatyw ekologicznych i dążeń do stworzenia „zielonego miasta przyszłości.” W kraju, gdzie powierzchnia jest ograniczona, prowadzone są liczne projekty zazieleniania przestrzeni miejskich. Singapur wprowadza zielone dachy, parki pionowe oraz miejskie ogrody, które poprawiają jakość powietrza i obniżają temperaturę w mieście. Dodatkowo wdrożono innowacyjne systemy zarządzania wodą, które umożliwiają efektywne wykorzystanie zasobów wodnych i recykling wody deszczowej. Kraj dąży do bycia w pełni samowystarczalnym pod względem wody i energii, stawiając na rozwój technologii odnawialnych i zachęcanie mieszkańców do zrównoważonego stylu życia. Singapur jest inspirującym przykładem tego, jak zaawansowane technologie i zrównoważone planowanie mogą wspierać środowisko w miejskiej przestrzeni." },
+    "China": { title: "Chiny: Tama Trzech Przełomów – Największa Elektrownia Wodna na Świecie", content: "Tama Trzech Przełomów w Chinach to największa na świecie elektrownia wodna, zbudowana na rzece Jangcy. Tama ma ogromny wpływ na gospodarkę i środowisko Chin, generując energię odnawialną dla milionów domów oraz zmniejszając zależność kraju od paliw kopalnych. Projekt ten, choć ma na celu poprawę jakości powietrza, budzi również kontrowersje. Budowa tamy wymagała przesiedlenia setek tysięcy ludzi i spowodowała zmiany w ekosystemie rzeki. Powstanie tamy miało również wpływ na rolnictwo i lokalne gatunki zwierząt, które musiały dostosować się do nowych warunków. Mimo wyzwań, Tama Trzech Przełomów jest przykładem ogromnej inwestycji w energię odnawialną i stanowi jeden z symboli nowoczesnych Chin." },
+    "Australia": { title: "Australia: wymieranie Wielkiej Rafy Koralowej", content: "Wielka Rafa Koralowa w Australii, jeden z największych i najbardziej złożonych ekosystemów koralowych na świecie, jest zagrożona wymieraniem. Zmiany klimatyczne, zanieczyszczenie i wzrost temperatury oceanów powodują blaknięcie i śmierć koralowców. Rafa jest domem dla tysięcy gatunków ryb, roślin i zwierząt, które są zależne od zdrowia ekosystemu koralowego. Jest ona nie tylko miejscem o ogromnym znaczeniu ekologicznym, ale także ważnym ośrodkiem turystycznym. Władze Australii oraz międzynarodowe organizacje podejmują działania na rzecz ochrony rafy, w tym ograniczanie emisji gazów cieplarnianych oraz wprowadzanie regulacji w zakresie zanieczyszczeń. Przetrwanie rafy zależy od globalnych działań na rzecz klimatu i ochrony oceanów." },
+    "Antarctica (East)": { title: "Antarktyda: topniejące lodowce", content: "Antarktyda, kontynent pokryty lodem, jest szczególnie narażona na skutki zmian klimatycznych. Wzrost globalnej temperatury powoduje topnienie lodowców, co prowadzi do podnoszenia się poziomu mórz na całym świecie. Antarktyda jest domem dla wielu unikalnych gatunków zwierząt, takich jak pingwiny i foki, które są zależne od stabilnych warunków lodowych. Topnienie lodu wpływa na środowisko morskie, zmniejszając obszar lodu morskiego, co zagraża przetrwaniu tych gatunków. Działania mające na celu redukcję emisji gazów cieplarnianych są kluczowe dla zahamowania procesu topnienia i ochrony bioróżnorodności tego kontynentu." },
+    "Pacific Ocean": { title: "Ocean Spokojny: wielka pływająca wyspa śmieci", content: "Wielka pływająca wyspa śmieci to gigantyczne skupisko odpadów, głównie tworzyw sztucznych, unoszących się na powierzchni Oceanu Spokojnego. Jest to wynik dziesięcioleci zanieczyszczenia wód oceanicznych przez odpady, które przenoszone przez prądy morskie gromadzą się na powierzchni oceanu. Wyspa śmieci zajmuje obszar szacowany na ponad 1,6 miliona km², co stanowi zagrożenie dla ekosystemów morskich. Odpady te stanowią niebezpieczeństwo dla organizmów wodnych, które mylą plastik z pożywieniem, a toksyczne substancje zagrażają ich zdrowiu. Wielka Pływająca Wyspa Śmieci jest symbolem wyzwań ekologicznych i konieczności globalnych działań na rzecz ograniczenia produkcji odpadów z tworzyw sztucznych oraz promowania recyklingu." },
+    "South Africa": { title: "Afryka: Problemy z Kłusownictwem", content: "Kłusownictwo w Afryce to poważny problem ekologiczny, który zagraża wielu gatunkom dzikich zwierząt, w tym słoniom, nosorożcom czy lwom. Wiele z tych zwierząt jest zabijanych dla swoich cennych rogów, skór lub mięsa, które są sprzedawane na czarnym rynku. Kłusownictwo prowadzi do dramatycznego spadku liczby osobników tych gatunków, a w niektórych przypadkach do ich wyginięcia. W szczególności słonie są masowo zabijane dla ich ciosów, a nosorożce dla rogów, które mają wartość w medycynie tradycyjnej oraz na rynku kolekcjonerskim. Choć Afryka jest domem dla wielu unikalnych i cennych gatunków, kłusownictwo stanowi ogromne zagrożenie dla bioróżnorodności i równowagi ekosystemów. Aby przeciwdziałać temu zjawisku, w wielu krajach Afryki wprowadzono surowe przepisy ochrony zwierząt oraz zorganizowano działania edukacyjne, które mają na celu uświadamianie lokalnych społeczności o zagrożeniu związanym z kłusownictwem. Ponadto, organizacje pozarządowe, rządy oraz parki narodowe współpracują, aby wzmacniać patrole ochrony zwierząt i stosować nowoczesne technologie, takie jak drony czy systemy śledzenia, które pomagają wykrywać i zapobiegać kłusownictwu." },
+};
+
+function addMarkers() {
+    const mapContainer = document.getElementById('mapContainer');
+
+    points.forEach(point => {
+        const marker = document.createElement('div');
+        marker.classList.add('marker', point.color); // Add color as class
+        marker.style.left = point.left; // Use point.left
+        marker.style.top = point.top; // Use point.top
+        marker.addEventListener('click', () => showLesson(point.country)); // Show lesson when clicked
+        mapContainer.appendChild(marker);
+    });
+}
+
+// function checkForBadge() {
+//     // Example: Give a badge after visiting 5 countries
+//     if (visitedCountries.length >= 5) {
+//         alert("Gratulacje! Zdobyłeś odznakę za odwiedzenie 5 krajów.");
+//     }
+// }
+
+function showLesson(country) {
+    const lessonContainer = document.getElementById('lessonContainer');
+    const lessonTitle = document.getElementById('lessonTitle');
+    const lessonText = document.getElementById('lessonText');
+
+    console.log("Showing lesson for country: " + country); // Debugging line
+
+    if (lessons[country]) {
+        lessonTitle.innerText = lessons[country].title;
+        lessonText.innerText = lessons[country].content;
+
+        lessonContainer.classList.remove('hidden');
+        lessonContainer.classList.add('visible');
+
+        currentCountry = country; // Save the current country
+    } else {
+        alert("Brak lekcji dla tego kraju. Wybierz inny kraj.");
+    }
+
+    if (!visitedCountries.includes(country)) {
+        visitedCountries.push(country);
+        checkForBadge(); // Check for badges
+    }
+}
+
+// Redirect function to navigate to different files or URLs
+function redirectToFile() {
+    // You can customize this to redirect to different pages based on the current country
+    switch (currentCountry) {
+        case "Norway":
+            window.location.href = "norway.html"; // Example redirection
+            break;
+        case "Sweden":
+            window.location.href = "sweden.html";
+            break;
+        case "Brazil":
+            window.location.href = "brazil.html";
+            break;
+        case "Sahara":
+            window.location.href = "sahara.html";
+            break;    
+        case "Singapore":
+            window.location.href = "singapore.html";
+            break;
+        case "China":
+            window.location.href = "china.html";
+            break;
+        case "Australia":
+            window.location.href = "australia.html";
+            break;
+        case "Antarctica (East)":
+            window.location.href = "antarctica.html";
+            break;
+        case "Pacific Ocean":
+            window.location.href = "pacific.html";
+            break;
+        case "South Africa":
+            window.location.href = "africa.html";
+            break;
+                                            
+                
+        // Add cases for other countries
+        default:
+            alert("No file for this country.");
+            break;
+    }
+}
+
+// Event listener for the "Next" button
+document.getElementById('nextButton').addEventListener('click', () => {
+    // Hide the lesson and redirect to the relevant file
+    document.getElementById('lessonContainer').classList.add('hidden');
+    redirectToFile(); // Redirect to the file based on the current country
+});
+
+// Initialize the map markers when the page loads
+window.onload = addMarkers;
+
+  </script>
+</body>
+</html>

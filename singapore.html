@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gra Znajdź Kwiaty</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-image: url(zdjecia/sing.jpg);
+        }
+
+        .game-container {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.774);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-area {
+            position: relative;
+            width: 600px;
+            height: 400px;
+        }
+
+        .background {
+            width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+
+        /* Ukryte punkty kwiatów */
+        .flower {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .flower img {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+            border-radius: 50%;
+        }
+
+        /* Stylizacja po znalezieniu kwiatu */
+        .flower.found img {
+            opacity: 1;
+            border: 2px solid rgba(255, 0, 0, 0.5);
+        }
+
+        #progress {
+            margin-top: 10px;
+            font-size: 1.2em;
+        }
+        #navigate-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ffb703;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #navigate-button:active {
+            background-color: #fb8500;
+        }
+    </style>
+</head>
+<body>
+    <button id="navigate-button" onclick="window.location.href='main4-8.html'">Powrót do mapy</button>
+
+    <div class="game-container">
+        <h1>Znajdź wszystkie 10 kwiatów</h1>
+        <div class="game-area">
+            <img src="zdjecia/singapur.jpg" alt="Tło" class="background">
+            <!-- Punkty kwiatów rozmieszczone na obrazie -->
+            <div class="flower" data-flower-id="1" style="top: 60%; left: 30%;"><img src="zdjecia/orchid.jpg" alt=""></div>
+            <div class="flower" data-flower-id="2" style="top: 59%; left: 52%;"><img src="zdjecia/orchid2.jpg" alt=""></div>
+            <div class="flower" data-flower-id="3" style="top: 1%; left: 96%;"><img src="zdjecia/orchid3.jpg" alt=""></div>
+            <div class="flower" data-flower-id="4" style="top: 79%; left: 33%;"><img src="zdjecia/orchid4.jpg" alt=""></div>
+            <div class="flower" data-flower-id="5" style="top: 46%; left: 23%;"><img src="zdjecia/orchid5.jpg" alt=""></div>
+            <div class="flower" data-flower-id="6" style="top: 38%; left: 11%;"><img src="zdjecia/orchid6.jpg" alt=""></div>
+            <div class="flower" data-flower-id="7" style="top: 78%; left: 89%;"><img src="zdjecia/orchid7.jpg" alt=""></div>
+            <div class="flower" data-flower-id="8" style="top: 62%; left: 70%;"><img src="zdjecia/orchid8.jpg" alt=""></div>
+            <div class="flower" data-flower-id="9" style="top: 30%; left: 24%;"><img src="zdjecia/orchid9.jpg" alt=""></div>
+            <div class="flower" data-flower-id="10" style="top: 28%; left: 48%;"><img src="zdjecia/orhide.jpg" alt=""></div>
+        </div>
+        <div id="progress">Znalezione kwiaty: 0 / 10</div>
+    </div>
+    <script>
+        // Wybierz wszystkie elementy kwiatów i wyświetlacz postępu
+        const flowers = document.querySelectorAll('.flower');
+        const progressDisplay = document.getElementById('progress');
+        let flowersFound = 0;
+
+        // Przypisz zdarzenie kliknięcia do każdego kwiatu
+        flowers.forEach(flower => {
+            flower.addEventListener('click', () => {
+                // Sprawdź, czy kwiat został już znaleziony
+                if (!flower.classList.contains('found')) {
+                    flower.classList.add('found'); // Oznacz jako znaleziony
+                    flowersFound++;
+                    updateProgress();
+                }
+            });
+        });
+
+        // Aktualizuj wyświetlacz postępu
+        function updateProgress() {
+            progressDisplay.textContent = `Znalezione kwiaty: ${flowersFound} / 10`;
+
+            // Sprawdź, czy wszystkie kwiaty zostały znalezione
+            if (flowersFound === flowers.length) {
+                alert('Gratulacje! Znalazłeś wszystkie kwiaty!');
+            }
+        }
+    </script>
+</body>
+</html>

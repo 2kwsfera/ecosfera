@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekologiczna Gra - Menu</title>
+    <style>
+       /* Globalne style */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: radial-gradient(circle at center, #1b1b38, #0b0b29);
+    overflow: hidden;
+    color: white;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://www.transparenttextures.com/patterns/stardust.png');
+    opacity: 0.2;
+}
+
+.menu-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.5s ease;
+    z-index: 2;
+    position: relative;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.menu-button {
+    padding: 15px 20px;
+    font-size: 18px;
+    color: white;
+    background-color: #4caf50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.menu-button:hover {
+    background-color: #388e3c;
+    transform: scale(1.05);
+}
+
+/* Stylizacja przycisków poziomów jako siatki 3x3 */
+.circle-menu {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.circle-menu a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: #4caf50;
+    width: 80px;
+    height: 80px;
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+.circle-menu a:hover {
+    background-color: #388e3c;
+    transform: scale(1.1);
+}
+
+/* Stylizacje dla głównego menu oraz powrotu */
+.slide-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.089);
+    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.5);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: right 0.5s ease;
+    color: white;
+    overflow-y: auto;
+    z-index: 3;
+}
+
+.slide-menu h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.earth-container {
+    width: 100%;
+    height: calc(100% - 150px);
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+iframe {
+    margin-top: 40px;
+    width: 500px;
+    height: 500px;
+    border: none;
+    box-shadow: 0 0 200px 100px rgba(0, 0, 0, 0.7);
+}
+
+.back-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 10px 15px;
+    font-size: 24px;
+    color: white;
+    background-color: #f4433628;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    z-index: 5;
+}
+
+.back-button:hover {
+    background-color: #c719195d;
+    transform: scale(1.05);
+}
+
+.hidden {
+    display: none;
+}
+
+/* Stylizacja galerii */
+.gallery-item {
+    width: 150px;
+    height: 150px;
+    background-color: #4caf50;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    box-sizing: border-box;
+    margin: 10px;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* Media Queries dla responsywności */
+@media (max-width: 768px) {
+    .slide-menu {
+        width: 100%;
+    }
+    .menu-button {
+        font-size: 16px;
+        padding: 12px 15px;
+    }
+    .circle-menu {
+        gap: 10px;
+    }
+    .circle-menu a {
+        width: 60px;
+        height: 60px;
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .slide-menu {
+        padding: 20px;
+    }
+    .menu-button {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+    .circle-menu {
+        gap: 8px;
+    }
+    .circle-menu a {
+        width: 50px;
+        height: 50px;
+        font-size: 16px;
+    }
+    .back-button {
+        font-size: 20px;
+        padding: 8px 10px;
+    }
+}
+#navigate-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ffb703;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #navigate-button:active {
+            background-color: #fb8500;
+        }
+    </style>
+</head>
+<body>
+    <button id="navigate-button" onclick="window.location.href='index.html'">Zmiana poziomu</button>
+
+    <div class="menu-container" id="menuContainer">
+        <div class="menu">
+            <button class="menu-button" onclick="moveToLeft('Graj')">Wybierz poziom</button>
+            <button class="menu-button" onclick="moveToLeft('Ustawienia')">Ustawienia</button>
+        </div>
+    </div>
+
+    <button class="back-button hidden" id="backButton" onclick="moveToCenter()">&lt;</button>
+
+    <div class="slide-menu" id="slideMenu">
+        
+        <div class="circle-menu">
+            <a href="labirynt.html">1</a>
+            <a href="dzwięki.html">2</a>
+            <a href="main.html">3</a>
+            <a href="śmieci.html">4</a>
+            <a href="labirynt.html">5</a>
+            <a href="śmieci.html">6</a>
+            <a href="dzwięki.html">7</a>
+            <a href="main.html">8</a>
+            <a href="labirynt.html">9</a>
+        </div>
+        <div class="earth-container">
+            <iframe src="https://solarsystem.nasa.gov/gltf_embed/2393/" allow="fullscreen"></iframe>
+        </div>
+    </div>
+
+    <div class="slide-menu hidden" id="settingsMenu">
+        <h2>Ustawienia:</h2>
+        <label class="settings-label">
+            <input type="checkbox" id="musicToggle" checked onchange="toggleMusic()">
+            Muzyka
+        </label>
+        <label class="settings-label">
+            Głośność muzyki
+            <input type="range" min="0" max="100" value="50" id="volumeControl" class="volume-slider" oninput="updateVolume()">
+        </label>
+    </div>
+
+    <div class="slide-menu hidden" id="galleryMenu">
+        
+        <div class="gallery-menu" id="galleryContent"></div>
+    </div>
+
+    <audio id="backgroundMusic" src="zdjecia/bgm.mp3" loop></audio>
+
+    <script>
+        let G1Finished = true;
+        let G2Finished = true;
+        let G3Finished = false;
+        let G4Finished = false;
+
+        const galleryImages = ["award1.png", "award2.png", "award3.png", "award4.png"];
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        backgroundMusic.volume = 0.5;
+
+        function toggleMusic() {
+            const musicToggle = document.getElementById('musicToggle');
+            if (musicToggle.checked) {
+                backgroundMusic.play();
+            } else {
+                backgroundMusic.pause();
+            }
+        }
+
+        function updateVolume() {
+            const volumeControl = document.getElementById('volumeControl');
+            backgroundMusic.volume = volumeControl.value / 100;
+        }
+
+        function startMusicOnFirstClick() {
+            const musicToggle = document.getElementById('musicToggle');
+            if (musicToggle.checked) {
+                backgroundMusic.play(); // Odtworzenie muzyki po pierwszej interakcji
+            }
+        }
+
+        function moveToLeft(option) {
+            startMusicOnFirstClick();
+
+            const menuContainer = document.getElementById('menuContainer');
+            const slideMenu = document.getElementById('slideMenu');
+            const settingsMenu = document.getElementById('settingsMenu');
+            const galleryMenu = document.getElementById('galleryMenu');
+            const backButton = document.getElementById('backButton');
+
+            menuContainer.style.transform = 'translateX(-600%)';
+            slideMenu.style.right = '-100%';
+            settingsMenu.style.right = '-100%';
+            galleryMenu.style.right = '-100%';
+
+            setTimeout(() => {
+                if (option === 'Graj') {
+                    slideMenu.style.right = '0';
+                } else if (option === 'Ustawienia') {
+                    settingsMenu.classList.remove('hidden');
+                    settingsMenu.style.right = '0';
+                } else if (option === 'Galeria') {
+                    galleryMenu.classList.remove('hidden');
+                    galleryMenu.style.right = '0';
+                    loadGalleryImages();
+                }
+                backButton.classList.remove('hidden');
+            }, 500);
+        }
+
+        function moveToCenter() {
+            const menuContainer = document.getElementById('menuContainer');
+            const slideMenu = document.getElementById('slideMenu');
+            const settingsMenu = document.getElementById('settingsMenu');
+            const galleryMenu = document.getElementById('galleryMenu');
+            const backButton = document.getElementById('backButton');
+
+            menuContainer.style.transform = 'translateX(0)';
+            slideMenu.style.right = '-100%';
+            settingsMenu.style.right = '-100%';
+            galleryMenu.style.right = '-100%';
+
+            setTimeout(() => {
+                settingsMenu.classList.add('hidden');
+                galleryMenu.classList.add('hidden');
+                backButton.classList.add('hidden');
+            }, 500);
+        }
+
+        function loadGalleryImages() {
+            const galleryContent = document.getElementById('galleryContent');
+            galleryContent.innerHTML = '';
+
+            galleryImages.forEach((image, index) => {
+                if ((index === 0 && G1Finished) || (index === 1 && G2Finished) || 
+                    (index === 2 && G3Finished) || (index === 3 && G4Finished)) {
+                    const imgDiv = document.createElement('div');
+                    imgDiv.className = 'gallery-item';
+                    imgDiv.innerHTML = `<img src="${image}" alt="Nagroda ${index + 1}">`;
+                    galleryContent.appendChild(imgDiv);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

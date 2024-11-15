@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gra Edukacyjna: Eco-Labirynt</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-size: cover;
+            background-color: #a3d9ff;
+            flex-direction: column;
+            font-family: 'Comic Sans MS', sans-serif;
+            color: #305f72;
+            padding: 10px;
+            box-sizing: border-box;
+            background-image: url(zdjecia/saha.jpg);
+        }
+
+        #game-container {
+            position: relative;
+            text-align: center;
+            max-width: 100%;
+            max-height: 100%;
+            background-color: rgba(255, 255, 255, 0.589);
+            border-radius: 20px;
+            width: 100vh;
+            height: 100vh;
+        }
+
+        #game-canvas {
+            border: 6px solid #27ae60;
+            background-color: rgb(247, 247, 247);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            width: 90vw;
+            height: 90vw;
+            max-width: 700px;
+            max-height: 700px;
+        }
+
+        #controls {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #ffb703;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:active {
+            background-color: #fb8500;
+            transform: scale(0.95);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background-color: #f0f9ff;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            color: #305f72;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        #submit-answer, #close-notification {
+            background-color: #ffb703;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #submit-answer:active, #close-notification:active {
+            background-color: #fb8500;
+        }
+
+        input {
+            padding: 8px;
+            margin-top: 10px;
+            border: 2px solid #457b9d;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        /* Button positioning for top-left corner */
+        #navigate-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ffb703;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #navigate-button:active {
+            background-color: #fb8500;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 24px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .modal-content {
+                padding: 15px;
+            }
+
+            #game-canvas {
+                width: 90vw;
+                height: 90vw;
+            }
+
+            input {
+                font-size: 12px;
+            }
+        }
+        #answer-options {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+
+    </style>
+</head>
+<body>
+    <button id="navigate-button" onclick="window.location.href='main4-8.html'">Powrót do mapy</button>
+    <div id="game-container">
+        <h1>LABIRYNT</h1>
+        <p>odpowiedz na wszystkie pytania umieszczone w labiryncie <br> aby dojść do wyjścia</p>
+        <canvas id="game-canvas"></canvas>
+        <div id="controls">
+            <button id="up">↑</button>
+            <button id="left">←</button>
+            <button id="down">↓</button>
+            <button id="right">→</button>
+        </div>
+    </div>
+    <div id="question-modal" class="modal">
+        <div class="modal-content">
+            <p id="question"></p>
+            <div id="answer-options"></div> <!-- Answer options container -->
+        </div>
+    </div>
+    <div id="notification-modal" class="modal">
+        <div class="modal-content">
+            <p id="notification-message"></p>
+            <button id="close-notification">X</button>
+        </div>
+    </div>
+
+    <script>
+               document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('game-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 700;
+            canvas.height = 700;
+
+            let player = { x: 20, y: 20, size: 20, speed: 1, dx: 0, dy: 0 };
+            const maze = [
+                [0, 0, 0, 0, 0, 0, 1, 1, 1, 0],
+                [1, 1, 1, 1, 0, 0, 0, 0, 1, 0],
+                [1, 0, 1, 1, 1, 1, 1, 0, 0, 0],
+                [1, 0, 1, 0, 1, 0, 0, 0, 1, 0],
+                [0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+                [0, 1, 1, 1, 1, 0, 0, 0, 0, 1],
+                [0, 1, 0, 1, 1, 0, 1, 1, 0, 1],
+                [0, 0, 0, 0, 1, 0, 0, 1, 0, 0],
+                [1, 1, 1, 0, 1, 1, 0, 1, 1, 0],
+                [0, 0, 0, 0, 1, 0, 0, 0, 1, 0]
+            ];
+            const cellSize = 70;
+
+            const questions = [
+                { x: 70, y: 140, question: "Jaki jest główny cel farm słonecznych na Saharze?", options: ["A.  Produkcja energii odnawialnej", "B. Zwiększenie turystyki", "C. Tworzenie oaz", "D. Zmniejszenie powierzchni Sahary"], answer: "A", answered: false },
+                { x: 630, y: 10, question: "Dlaczego Sahara jest idealnym miejscem dla farm słonecznych?", options: ["A.  Ma najwięcej opadów", "B. Jest najbardziej zaludniona", "C. Ma wysokie nasłonecznienie", "D. Jest pokryta roślinnością"], answer: "C", answered: false },
+                { x: 0, y: 630, question: "Jakie korzyści lokalne przynosi energia słoneczna w Afryce Północnej?", options: ["A. Zwiększenie liczby upraw rolnych", "B. Tworzenie miejsc pracy", "C. Zmniejszenie liczby turystów", "D. Zwiększenie liczby parków narodowych"], answer: "B", answered: false }
+            ];
+
+            const questionImage = new Image();
+            questionImage.src = 'question_mark.gif';
+
+            let allAnswered = false;
+            const exit = { x: 630, y: 680, size: 80 };
+
+            function drawMaze() {
+                ctx.fillStyle = '#2b3d52';
+                for (let row = 0; row < maze.length; row++) {
+                    for (let col = 0; col < maze[0].length; col++) {
+                        if (maze[row][col] === 1) {
+                            ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                        }
+                    }
+                }
+            }
+
+            function drawPlayer() {
+                ctx.fillStyle = '#ffb703';
+                ctx.fillRect(player.x, player.y, player.size, player.size);
+            }
+
+            function drawExit() {
+                ctx.fillStyle = 'green';
+                ctx.fillRect(exit.x, exit.y, exit.size, exit.size);
+            }
+
+            function drawQuestionMarks() {
+                questions.forEach(question => {
+                    if (!question.answered) {
+                        ctx.drawImage(questionImage, question.x, question.y, 50, 50);
+                    }
+                });
+            }
+
+            function showQuestion(question) {
+                const modal = document.getElementById('question-modal');
+                document.getElementById('question').textContent = question.question;
+                
+                const answerOptions = document.getElementById('answer-options');
+                answerOptions.innerHTML = '';  // Clear previous options
+                
+                question.options.forEach(option => {
+                    const optionButton = document.createElement('button');
+                    optionButton.textContent = option;
+                    optionButton.onclick = () => checkAnswer(option, question);
+                    optionButton.style.display = 'block';
+                    optionButton.style.margin = '5px 0';
+                    optionButton.style.padding = '10px';
+                    answerOptions.appendChild(optionButton);
+                });
+                
+                modal.style.display = 'flex';
+            }
+
+            function checkAnswer(selectedOption, question) {
+                const selectedAnswer = selectedOption.split(".")[0];
+                if (selectedAnswer === question.answer) {
+                    question.answered = true;
+                    document.getElementById('question-modal').style.display = 'none';
+                    checkCompletion();
+                } else {
+                    alert('Spróbuj ponownie!');
+                }
+            }
+
+            function showNotification(message) {
+                const modal = document.getElementById('notification-modal');
+                document.getElementById('notification-message').textContent = message;
+                modal.style.display = 'flex';
+                document.getElementById('close-notification').onclick = () => modal.style.display = 'none';
+            }
+
+            function checkCompletion() {
+                allAnswered = questions.every(q => q.answered);
+                if (allAnswered) {
+                    showNotification("Gratulacje! Udaj się do wyjścia aby ukończyć grę!");
+                }
+                else{
+                    showNotification("Gratulacje udzielileś poprawnej odpowiedzi");
+                }
+            }
+
+            function update() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawMaze();
+                drawExit();
+                drawPlayer();
+                drawQuestionMarks();
+            }
+
+            function movePlayer(dx, dy) {
+                const newX = player.x + dx * cellSize;
+                const newY = player.y + dy * cellSize;
+
+                if (newX >= 0 && newX < canvas.width && newY >= 0 && newY < canvas.height && maze[Math.floor(newY / cellSize)][Math.floor(newX / cellSize)] === 0) {
+                    player.x = newX;
+                    player.y = newY;
+                }
+                update();
+                checkPlayerPosition();
+            }
+
+            function checkPlayerPosition() {
+                questions.forEach(question => {
+                    if (!question.answered && Math.abs(player.x - question.x) < 50 && Math.abs(player.y - question.y) < 50) {
+                        showQuestion(question);
+                    }
+                });
+
+                if (Math.abs(player.x - exit.x) < exit.size && Math.abs(player.y - exit.y) < exit.size) {
+                    if (allAnswered) {
+                        showNotification("Gratulacje! Ukończyłeś grę!");
+                    } else {
+                        showNotification("Musisz odpowiedzieć na wszystkie pytania przed wyjściem!");
+                    }
+                }
+            }
+
+            document.getElementById('up').addEventListener('click', () => movePlayer(0, -1));
+            document.getElementById('down').addEventListener('click', () => movePlayer(0, 1));
+            document.getElementById('left').addEventListener('click', () => movePlayer(-1, 0));
+            document.getElementById('right').addEventListener('click', () => movePlayer(1, 0));
+
+            update();
+        });
+    </script>
+</body>
+</html>

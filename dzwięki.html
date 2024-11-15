@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gra w dźwięki natury</title>
+  <style>
+    /* CSS Style */
+
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-image: url(zdjecia/dz.jpg);
+
+    }
+
+    
+#container {
+  position: relative;
+  text-align: center;
+  max-width: 100%;
+  max-height: 100%;
+  background-color: rgba(245, 245, 245, 0.819);
+  border-radius: 20px;
+  padding: 2vh;
+  width: 40vh;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  margin: auto;
+}
+
+    h1 {
+      color: #4e8a29;
+      margin-top: 20px;
+    }
+
+    #game-container {
+      background-color: #fff;
+      border: 2px solid #4e8a29;
+      border-radius: 10px;
+      padding: 20px;
+      width: 320px;
+      margin: 20px auto;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    #play-sound, .answer-btn, .level-btn {
+      background-color: #f9d142;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .level-btn {
+      background-color: #4e8a29;
+      color: white;
+      font-size: 14px;
+    }
+
+    .answer-btn img {
+      width: 80px; /* Image size */
+      height: 80px;
+    }
+
+    .answer-btn:hover, #play-sound:hover, .level-btn:hover {
+      background-color: #c7b238;
+    }
+
+    #feedback {
+      font-size: 16px;
+      color: #4e8a29;
+      margin-top: 10px;
+    }
+
+    #levels {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    #score, #lives {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+
+    /* Style for modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #4e8a29;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .close-btn {
+      background-color: #f9d142;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #navigate-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ffb703;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #navigate-button:active {
+            background-color: #fb8500;
+        }
+  </style>
+</head>
+<body>
+  <button id="navigate-button" onclick="window.location.href='menu1-3.html'">Powrót</button>
+<div id="container">
+  <h1>Gra w dźwięki natury</h1>
+  <p>Wybierz odpowiedni dźwięk natury do środowiska, które słyszysz.</p>
+
+  <!-- Level selection -->
+  <div id="levels">
+    <button class="level-btn" data-level="łatwy">Łatwy</button>
+    <button class="level-btn" data-level="trudny">Trudny</button>
+  </div>
+
+  <!-- Game container -->
+  <div id="game-container">
+    <div id="sound-player">
+    </div>
+    <div id="score">Punkty: <span id="score-count">0</span></div>
+    <div id="lives">Życia: <span id="lives-count">3</span></div>
+    <div id="answers">
+      <!-- Answer buttons will be generated based on level -->
+    </div>
+    <div id="feedback"></div>
+  </div>
+
+  <!-- Win modal -->
+  <div id="win-modal" class="modal">
+    <div class="modal-content">
+      <p>Gratulacje! Udało Ci się ukończyć grę!</p>
+      <button class="close-btn" onclick="closeModal()">Zamknij</button>
+    </div>
+  </div>
+
+  <!-- Game Over modal -->
+  <div id="game-over-modal" class="modal">
+    <div class="modal-content">
+      <p>Koniec gry! Spróbuj ponownie.</p>
+      <button class="close-btn" onclick="closeModal()">Zamknij</button>
+    </div>
+  </div>
+</div>
+  <script>
+   const sounds = {
+  malpa: { url: 'monkey.mp3', img: 'https://cdn.pixabay.com/photo/2023/02/18/13/48/barbary-macaque-7797970_1280.jpg', label: "Małpa" },
+  ptaki: { url: 'birds.mp3', img: 'https://media.istockphoto.com/id/1017810548/pl/zdj%C4%99cie/ma%C5%82a-sowa-ze-swoj%C4%85-piskl%C4%99-stoj%C4%85c%C4%85-na-kamieniu.jpg?s=2048x2048&w=is&k=20&c=DUzBs4WgFl0fcDVRNo8Fay6CCkeiQtD0Mjwt6xxOV5U=', label: "Ptaki" },
+  lew: { url: 'lion.mp3', img: 'https://images.pexels.com/photos/1598377/pexels-photo-1598377.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', label: "Lew" },
+  wąż: { url: 'snake.mp3', img: 'https://images.pexels.com/photos/80474/grass-snake-snake-serpentes-natrix-80474.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', label: "Wąż" },
+  słoń: { url: 'elephant.mp3', img: 'https://images.pexels.com/photos/133394/pexels-photo-133394.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', label: "Słoń" },
+  żaby: { url: 'frogs.mp3', img: 'https://media.istockphoto.com/id/153768983/pl/zdj%C4%99cie/zielona-%C5%BCaba-rana-clamitans-z-otwarte-usta-pinery-provincial-park.jpg?s=2048x2048&w=is&k=20&c=_DNwAOT7a1ue2rBaGVz9d3ajtiW6NQRIrNuG-ee40Rc=', label: "Żaby" },
+};
+
+let currentSound = '';
+let currentLevel = 'łatwy';
+let score = 0;
+let lives = 3;
+let currentAudio = null;
+let remainingSounds = Object.keys(sounds); // Lista dźwięków, które nie zostały jeszcze użyte
+
+const levels = {
+  łatwy: 6,
+  trudny: 6
+};
+
+document.querySelectorAll('.level-btn').forEach(button => {
+  button.addEventListener('click', function() {
+    currentLevel = this.getAttribute('data-level');
+    resetGame();
+    setupGame();
+  });
+});
+
+document.getElementById('play-sound').addEventListener('click', playSound);
+
+function playSound() {
+  // Stop any currently playing sound
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+  }
+
+  // Jeśli lista remainingSounds jest pusta, zresetuj ją
+  if (remainingSounds.length === 0) {
+    remainingSounds = Object.keys(sounds);
+  }
+
+  // Losuj nowy dźwięk z remainingSounds
+  currentSound = remainingSounds.splice(Math.floor(Math.random() * remainingSounds.length), 1)[0];
+  currentAudio = new Audio(sounds[currentSound].url);
+  currentAudio.play();
+  loadAnswers();
+}
+
+function loadAnswers() {
+  const answerContainer = document.getElementById('answers');
+  answerContainer.innerHTML = '';
+
+  let options = shuffle(Object.keys(sounds));
+  if (!options.includes(currentSound)) {
+    options[0] = currentSound;
+  }
+  options = options.slice(0, levels[currentLevel]);
+
+  options.forEach(soundKey => {
+    const button = document.createElement('button');
+    button.className = 'answer-btn';
+    button.setAttribute('data-answer', soundKey);
+
+    if (currentLevel === 'łatwy') {
+      const img = document.createElement('img');
+      img.src = sounds[soundKey].img;
+      button.appendChild(img);
+    } else {
+      button.textContent = sounds[soundKey].label;
+    }
+
+    button.addEventListener('click', function() {
+      checkAnswer(this.getAttribute('data-answer'), button);
+    });
+
+    answerContainer.appendChild(button);
+  });
+}
+
+function checkAnswer(selectedAnswer, button) {
+  const feedback = document.getElementById('feedback');
+  if (selectedAnswer === currentSound) {
+    feedback.textContent = "Brawo! Poprawna odpowiedź.";
+    feedback.style.color = "green";
+    button.style.visibility = 'hidden';
+    updateScore();
+  } else {
+    feedback.textContent = "Niestety, spróbuj ponownie.";
+    feedback.style.color = "red";
+    updateLives();
+  }
+}
+
+function updateScore() {
+  score++;
+  document.getElementById('score-count').textContent = score;
+
+  if (score === levels[currentLevel]) {
+    setTimeout(() => {
+      document.getElementById('win-modal').style.display = 'block';
+    }, 500);
+  } else {
+    playSound();
+  }
+}
+
+function updateLives() {
+  lives--;
+  document.getElementById('lives-count').textContent = lives;
+
+  if (lives === 0) {
+    setTimeout(() => {
+      document.getElementById('game-over-modal').style.display = 'block';
+    }, 500);
+  }
+}
+
+function closeModal() {
+  document.querySelectorAll('.modal').forEach(modal => {
+    modal.style.display = 'none';
+  });
+  resetGame();
+}
+
+function resetGame() {
+  score = 0;
+  lives = 3;
+  document.getElementById('score-count').textContent = score;
+  document.getElementById('lives-count').textContent = lives;
+  document.getElementById('feedback').textContent = '';
+  remainingSounds = Object.keys(sounds);
+
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+  }
+  playSound();
+}
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+  </script>
+</body>
+</html>
